@@ -306,7 +306,7 @@ Ingress manages external HTTP/HTTPS access to services inside the cluster. It ac
 - SSL/TLS termination
 - Load balancing
 
-**NOTE:** The Ingress resource does nothing on its own: a cluster needs an **Ingress Controller** installed (e.g. NGINX, Traefik, HAProxy, Contour). The Kubernetes project now marks the Ingress API as frozen (stable, but no new features) and recommends the Gateway API for new work; the Ingress API is not being removed. Note that the community `ingress-nginx` controller was announced as retired in March 2026, so prefer another controller in real clusters.
+**NOTE:** The Ingress resource does nothing on its own: a cluster needs an **Ingress Controller** installed (e.g. NGINX, Traefik, HAProxy, Contour). The Kubernetes project now marks the Ingress API as frozen (stable, but no new features) and recommends the Gateway API for new work; the Ingress API is not being removed. Note that the community `ingress-nginx` controller was [retired on 24 March 2026](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) (no more fixes or security updates), so prefer another controller in real clusters.
 
 ### Two Components
 1. **Ingress Controller** - The deployment that processes the rules (e.g. NGINX)

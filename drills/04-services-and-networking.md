@@ -226,7 +226,7 @@ spec:
       port: 53
 ```
 
-Forget the DNS rule and every lookup by name fails, even to `db`. That's the most common egress mistake.
+Forget the DNS rule and every lookup by name fails, even to `db`. It's an easy egress mistake to make.
 </details>
 
 ---

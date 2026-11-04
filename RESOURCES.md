@@ -6,11 +6,11 @@ You don't need many resources. You need **one** course, a practice cluster, the 
 
 | Course | Why | Cost |
 |---|---|---|
-| **[Kubernetes Certified Application Developer (CKAD) with Tests](https://www.udemy.com/course/certified-kubernetes-application-developer/)**, Mumshad Mannambeth / KodeKloud (Udemy) | **Recommended.** Short videos, each followed by a browser lab. Lightning labs and mock exams at the end. Covers the whole curriculum. | Udemy price. It goes on sale often, so don't pay full price. |
+| **[Kubernetes Certified Application Developer (CKAD) with Tests](https://www.udemy.com/course/certified-kubernetes-application-developer/)**, Mumshad Mannambeth / KodeKloud (Udemy) | **Recommended.** Short videos, each followed by a browser lab. Lightning labs and mock exams at the end. Structured around the CKAD curriculum domains. | Udemy price. It goes on sale often, so don't pay full price. |
 | [LFD259 — Kubernetes for Developers](https://training.linuxfoundation.org/training/kubernetes-for-developers/) (Linux Foundation) | The official course, sold as a bundle with the exam. Thorough and text-heavy. | Bundle with the exam |
 | [KodeKloud CKAD course](https://kodekloud.com/) | The same author as the Udemy course, on the KodeKloud platform with extra labs. Worth it if you already have a KodeKloud subscription. | Subscription |
 
-Pick one and finish it. Switching courses halfway through is the most common way to lose weeks.
+Pick one and finish it. Switching courses halfway through costs time you'd rather spend drilling.
 
 ## 2. Practise
 
@@ -48,6 +48,6 @@ During the exam you may open only the [allowed resources](https://docs.linuxfoun
 
 ## What to avoid
 
-- **"Exam dumps" and leaked questions.** They break the exam's confidentiality agreement, can get a certification revoked, and they're usually wrong anyway. Everything in this repo is original.
+- **"Exam dumps" and leaked questions.** They break the exam's confidentiality agreement, can get a certification revoked, and nothing guarantees they're accurate. Everything in this repo is original.
 - **Collecting courses.** A second course feels productive, but drilling is what moves your score.
 - **Using killer.sh too early.** It's most useful once you've covered everything. Using it in Week 2 wastes one of your two sessions.

@@ -1,6 +1,6 @@
 # Exam day playbook
 
-The exam tests speed as much as knowledge. Many well-prepared candidates lose points to the environment, the clock or nerves. This page covers all three.
+The exam tests speed as much as knowledge. Being well prepared isn't enough if the environment, the clock or nerves cost you points. This page covers all three.
 
 Facts below come from the official [CKA & CKAD tips](https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad) and the [Candidate Handbook](https://docs.linuxfoundation.org/tc-docs/certification/lf-handbook2). Re-read both the week before your exam, because the environment changes over time.
 
@@ -29,7 +29,7 @@ Facts below come from the official [CKA & CKAD tips](https://docs.linuxfoundatio
 
 ## First 60 seconds
 
-Most people only need this, on each host where they'll edit YAML:
+This is usually enough, on each host where you'll edit YAML:
 
 ```bash
 echo 'set ts=2 sw=2 et ai nu' >> ~/.vimrc

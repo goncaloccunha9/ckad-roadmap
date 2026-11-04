@@ -18,13 +18,13 @@ Exam-style exercises with solutions, grouped by curriculum domain. All are origi
 3. Beat the target time → tick it in the roadmap. Over the target, or you had to peek → it goes on your redo list.
 4. Delete the namespace when you're done (`kubectl delete ns <name>`) and redo the drill from scratch two days later.
 
-Labels: **High yield** = shows up often in this kind of task. Everything else is still in scope. Target times assume you've drilled the topic. Your first attempt will be slower.
+Labels: **High yield** = a core skill that's heavily weighted in the curriculum or reused across many tasks. It's this guide's judgement, not official exam data, and everything else is still in scope. Target times are goals for when you've drilled the topic, not official numbers. Your first attempt will be slower.
 
 ## Practice cluster
 
 Pick one:
 
-- **Killercoda** (browser, nothing to install): open a [Kubernetes playground](https://killercoda.com/playgrounds). It's the closest thing to the exam terminal.
+- **Killercoda** (browser, nothing to install): open a [Kubernetes playground](https://killercoda.com/playgrounds). You get a real Linux terminal with a cluster, just like in the exam.
 - **kind** (local, needs Docker or Podman):
 
   ```bash

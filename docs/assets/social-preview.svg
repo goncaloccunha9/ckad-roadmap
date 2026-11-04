@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="CKAD Roadmap — from zero to exam-ready in 8 weeks">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#162a57"/></linearGradient>
+<linearGradient id="path" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4cc38a"/><stop offset="1" stop-color="#6c9cff"/></linearGradient>
+<pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#ffffff" opacity=".07"/></pattern>
+</defs>
+<rect width="1280" height="640" fill="url(#bg)"/>
+<rect width="1280" height="640" fill="url(#dots)"/>
+<text x="80" y="234.38095238095235" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="3.5" fill="#7aa7ff">CERTIFIED KUBERNETES APPLICATION DEVELOPER</text>
+<text x="76" y="312.38095238095235" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="800" fill="#ffffff" letter-spacing="-1.5">CKAD Roadmap</text>
+<text x="80" y="362.38095238095235" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="28" fill="#c7d2e5">From zero to exam-ready in 8 weeks</text>
+<rect x="80" y="390.38095238095235" width="200" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>
+<text x="180" y="414.38095238095235" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#e6ebf1">Interactive tracker</text>
+<rect x="292.4" y="390.38095238095235" width="162" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>
+<text x="373" y="414.38095238095235" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#e6ebf1">45 timed drills</text>
+<rect x="466.4" y="390.38095238095235" width="172" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>
+<text x="552" y="414.38095238095235" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#e6ebf1">6 exam scenarios</text>
+<rect x="650.0" y="390.38095238095235" width="181" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>
+<text x="741" y="414.38095238095235" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#e6ebf1">Exam-day playbook</text>
+<path d="M905.0,440.0 L940.6,435.3 L976.2,416.5 L1011.9,377.8 L1047.5,325.0 L1083.1,272.2 L1118.8,233.5 L1154.4,214.7 L1190.0,210.0" fill="none" stroke="url(#path)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 12"/>
+<circle cx="905.0" cy="440.0" r="13" fill="#4cc38a" stroke="#4cc38a" stroke-width="3"/>
+<text x="905.0" y="444.5" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#0b1220">W0</text>
+<circle cx="940.6" cy="435.3" r="13" fill="#4cc38a" stroke="#4cc38a" stroke-width="3"/>
+<text x="940.6" y="439.8" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#0b1220">W1</text>
+<circle cx="976.2" cy="416.5" r="13" fill="#4cc38a" stroke="#4cc38a" stroke-width="3"/>
+<text x="976.2" y="421.0" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#0b1220">W2</text>
+<circle cx="1011.9" cy="377.8" r="13" fill="#4cc38a" stroke="#4cc38a" stroke-width="3"/>
+<text x="1011.9" y="382.3" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#0b1220">W3</text>
+<circle cx="1047.5" cy="325.0" r="13" fill="#4cc38a" stroke="#4cc38a" stroke-width="3"/>
+<text x="1047.5" y="329.5" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#0b1220">W4</text>
+<circle cx="1083.1" cy="272.2" r="13" fill="#162a57" stroke="#6c9cff" stroke-width="3"/>
+<text x="1083.1" y="276.7" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#c7d2e5">W5</text>
+<circle cx="1118.8" cy="233.5" r="13" fill="#162a57" stroke="#6c9cff" stroke-width="3"/>
+<text x="1118.8" y="238.0" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#c7d2e5">W6</text>
+<circle cx="1154.4" cy="214.7" r="13" fill="#162a57" stroke="#6c9cff" stroke-width="3"/>
+<text x="1154.4" y="219.2" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#c7d2e5">W7</text>
+<circle cx="1190.0" cy="210.0" r="30" fill="#4cc38a" fill-opacity=".18"/>
+<circle cx="1190.0" cy="210.0" r="21" fill="#4cc38a"/>
+<path d="M1181.0,210.0 l6,7 l12,-14" fill="none" stroke="#0b1220" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1190.0" y="168.0" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#4cc38a">EXAM READY</text>
+<polygon points="1150.0,343.0 1179.4,360.0 1150.0,377.0 1120.6,360.0" fill="#6c9cff"/><polygon points="1120.6,360.0 1150.0,377.0 1150.0,411.0 1120.6,394.0" fill="#2f5fc4"/><polygon points="1150.0,377.0 1179.4,360.0 1179.4,394.0 1150.0,411.0" fill="#3f73de"/>
+<polygon points="1120.0,393.0 1149.4,410.0 1120.0,427.0 1090.6,410.0" fill="#8fb3ff"/><polygon points="1090.6,410.0 1120.0,427.0 1120.0,461.0 1090.6,444.0" fill="#3a67c9"/><polygon points="1120.0,427.0 1149.4,410.0 1149.4,444.0 1120.0,461.0" fill="#4a7de6"/>
+<polygon points="1180.0,393.0 1209.4,410.0 1180.0,427.0 1150.6,410.0" fill="#4cc38a"/><polygon points="1150.6,410.0 1180.0,427.0 1180.0,461.0 1150.6,444.0" fill="#2a8a5c"/><polygon points="1180.0,427.0 1209.4,410.0 1209.4,444.0 1180.0,461.0" fill="#36a771"/>
+</svg>

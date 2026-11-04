@@ -1,8 +1,31 @@
-# CKAD Roadmap
+<p align="center">
+  <a href="https://goncaloccunha9.github.io/ckad-roadmap/"><img src="docs/assets/banner.svg" alt="CKAD Roadmap — from zero to exam-ready in 8 weeks" width="100%"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/cncf/curriculum"><img src="https://img.shields.io/badge/curriculum-Kubernetes%20v1.37-326ce5?style=flat-square" alt="Curriculum: Kubernetes v1.37"></a>
+  <a href="drills/"><img src="https://img.shields.io/badge/drills-45%20%2B%206%20scenarios-4cc38a?style=flat-square" alt="45 drills + 6 scenarios"></a>
+  <a href="https://goncaloccunha9.github.io/ckad-roadmap/"><img src="https://img.shields.io/badge/roadmap-interactive-6c9cff?style=flat-square" alt="Interactive roadmap"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-CC%20BY%204.0-lightgrey?style=flat-square" alt="License: CC BY 4.0"></a>
+</p>
+
+<p align="center">
+  <a href="https://goncaloccunha9.github.io/ckad-roadmap/"><b>Interactive roadmap</b></a> ·
+  <a href="ROADMAP.md">Roadmap (Markdown)</a> ·
+  <a href="drills/">Drills</a> ·
+  <a href="notes/">Notes</a> ·
+  <a href="CHEATSHEET.md">Cheat sheet</a> ·
+  <a href="EXAM-DAY.md">Exam day</a> ·
+  <a href="RESOURCES.md">Resources</a>
+</p>
 
 **A complete, checkbox-driven plan to pass the Certified Kubernetes Application Developer exam in 8 weeks.**
 
 Every box is a concrete action: what to study, which drill to solve, when to take a mock, how to set up for exam day. Work through the boxes, pass the readiness gates, and the exam won't surprise you.
+
+<p align="center">
+  <a href="https://goncaloccunha9.github.io/ckad-roadmap/"><img src="docs/assets/roadmap-preview.png" alt="The interactive roadmap: overall progress, exam countdown and the current week's tasks" width="760"></a>
+</p>
 
 ### ▶ [Open the interactive roadmap](https://goncaloccunha9.github.io/ckad-roadmap/)
 
@@ -16,7 +39,7 @@ It tracks your progress, lays out the weeks from your exam date, and tells you w
 - **It's built on drills.** The CKAD is a hands-on exam against the clock, so most of the plan is timed practice: 45 drills and 6 exam-style scenarios with solutions.
 - **It goes heavy on high-yield topics.** Rollouts, Ingress + Services, NetworkPolicies, ConfigMaps/Secrets, SecurityContext and container images get the most repetition.
 - **You don't decide when you're ready by feel.** Objective readiness gates tell you when to sit the exam and when to reschedule.
-- **It covers the exam environment.** Shortcuts, the remote desktop, keyboard pitfalls and time strategy each lose people points. They're all covered in [EXAM-DAY.md](EXAM-DAY.md).
+- **It covers the exam environment.** Shortcuts, the remote desktop, keyboard pitfalls and time strategy can each cost points. They're all covered in [EXAM-DAY.md](EXAM-DAY.md).
 
 ## Start here
 
