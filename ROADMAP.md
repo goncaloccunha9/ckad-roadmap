@@ -147,3 +147,7 @@ Book or keep your date only when every gate is green.
 - [ ] Can find any example YAML in the allowed docs in under 30 seconds.
 - [ ] Can build, tag and export an image with docker or podman without looking anything up.
 - [ ] The exam environment check is done and your system passes.
+
+---
+
+© 2026 Gonçalo Cunha · [CKAD Roadmap](https://github.com/goncaloccunha9/ckad-roadmap) · [CC BY 4.0](LICENSE)

@@ -48,6 +48,10 @@ out.push("Book or keep your date only when every gate is green.");
 out.push("");
 R.gates.forEach((g) => out.push(`- [ ] ${g.text}`));
 out.push("");
+out.push("---");
+out.push("");
+out.push("© 2026 Gonçalo Cunha · [CKAD Roadmap](https://github.com/goncaloccunha9/ckad-roadmap) · [CC BY 4.0](LICENSE)");
+out.push("");
 
 fs.writeFileSync(path.join(root, "ROADMAP.md"), out.join("\n"));
 

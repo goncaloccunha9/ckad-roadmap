@@ -41,4 +41,5 @@
 <polygon points="1150.0,233.0 1179.4,250.0 1150.0,267.0 1120.6,250.0" fill="#6c9cff"/><polygon points="1120.6,250.0 1150.0,267.0 1150.0,301.0 1120.6,284.0" fill="#2f5fc4"/><polygon points="1150.0,267.0 1179.4,250.0 1179.4,284.0 1150.0,301.0" fill="#3f73de"/>
 <polygon points="1120.0,283.0 1149.4,300.0 1120.0,317.0 1090.6,300.0" fill="#8fb3ff"/><polygon points="1090.6,300.0 1120.0,317.0 1120.0,351.0 1090.6,334.0" fill="#3a67c9"/><polygon points="1120.0,317.0 1149.4,300.0 1149.4,334.0 1120.0,351.0" fill="#4a7de6"/>
 <polygon points="1180.0,283.0 1209.4,300.0 1180.0,317.0 1150.6,300.0" fill="#4cc38a"/><polygon points="1150.6,300.0 1180.0,317.0 1180.0,351.0 1150.6,334.0" fill="#2a8a5c"/><polygon points="1180.0,317.0 1209.4,300.0 1209.4,334.0 1180.0,351.0" fill="#36a771"/>
+<text x="80" y="390" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#94a3b8">by <tspan font-weight="700" fill="#e6ebf1">Gonçalo Cunha</tspan> · github.com/goncaloccunha9/ckad-roadmap</text>
 </svg>

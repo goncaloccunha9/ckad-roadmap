@@ -20,6 +20,7 @@
 </p>
 
 **A complete, checkbox-driven plan to pass the Certified Kubernetes Application Developer exam in 8 weeks.**
+Created and maintained by [Gonçalo Cunha](https://github.com/goncaloccunha9).
 
 Every box is a concrete action: what to study, which drill to solve, when to take a mock, how to set up for exam day. Work through the boxes, pass the readiness gates, and the exam won't surprise you.
 
@@ -102,4 +103,8 @@ This is an independent study guide. It isn't affiliated with or endorsed by the 
 
 ## License
 
-[CC BY 4.0](LICENSE). Use it, share it, adapt it. Just give credit.
+© 2026 Gonçalo Cunha. Licensed under [CC BY 4.0](LICENSE).
+
+You're free to share and adapt this material, including commercially, as long as you give credit. Please attribute it as:
+
+> *CKAD Roadmap* by Gonçalo Cunha — https://github.com/goncaloccunha9/ckad-roadmap — licensed under CC BY 4.0
