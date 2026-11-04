@@ -1,0 +1,173 @@
+// Single source of truth for the roadmap.
+// Rendered by docs/index.html and turned into ROADMAP.md by scripts/build-roadmap.mjs.
+// Task ids are stored in the reader's browser — never rename an existing id, only add new ones.
+// Links starting with "repo:" point to a file in this repository.
+
+var ROADMAP = {
+  updated: "2026-11",
+  // Public URL of the interactive page (GitHub Pages). Used by ROADMAP.md.
+  site: "https://goncaloccunha9.github.io/ckad-roadmap/",
+  exam: {
+    kubernetes: "v1.37",
+    duration: "2 hours",
+    tasks: "15–20 performance-based tasks",
+    passScore: "66%",
+    price: "$445 (one free retake + two killer.sh sessions included)",
+    validity: "2 years",
+  },
+  domains: [
+    { name: "Application Environment, Configuration and Security", weight: 25 },
+    { name: "Application Design and Build", weight: 20 },
+    { name: "Application Deployment", weight: 20 },
+    { name: "Services and Networking", weight: 20 },
+    { name: "Application Observability and Maintenance", weight: 15 },
+  ],
+  rules: [
+    "Practise in a terminal with vim every day. No IDE, no YAML linters, no copy-paste from your notes.",
+    "Spend 20 minutes a day on imperative speed: `kubectl create/run/expose ... --dry-run=client -o yaml`.",
+    "During practice, only open docs you're allowed to use in the exam (kubernetes.io/docs, kubernetes.io/blog, helm.sh/docs).",
+    "Time every drill. In the exam, knowing how to do something isn't enough. You have to do it fast.",
+    "Any drill you fail goes on a redo list. Repeat it two days later, then again a week later.",
+  ],
+  weeks: [
+    {
+      id: "w0",
+      title: "Week 0 — Set up",
+      goal: "Commit to an exam date and have a working practice environment before you study anything.",
+      tasks: [
+        { id: "w0-curriculum", type: "setup", text: "Download the current CKAD curriculum (v1.37) and keep it next to you. It's the official scope.", links: [{ label: "Curriculum", href: "https://github.com/cncf/curriculum" }] },
+        { id: "w0-handbook", type: "setup", text: "Read the Candidate Handbook and the CKA/CKAD exam tips page end to end (rules, ID, environment, shortcuts).", links: [{ label: "Handbook", href: "https://docs.linuxfoundation.org/tc-docs/certification/lf-handbook2" }, { label: "Exam tips", href: "https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad" }] },
+        { id: "w0-buy", type: "setup", text: "Buy the exam. The Linux Foundation runs frequent discounts, so check for one before paying full price.", links: [{ label: "CKAD", href: "https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/" }] },
+        { id: "w0-date", type: "setup", text: "Schedule the exam about 8 weeks from today. A fixed date keeps you moving, and you can still reschedule.", links: [] },
+        { id: "w0-course", type: "setup", text: "Pick ONE primary course and stick to it. See the recommendations in RESOURCES.", links: [{ label: "Resources", href: "repo:RESOURCES.md" }] },
+        { id: "w0-lab", type: "setup", text: "Get a practice cluster: a Killercoda playground in the browser, or kind locally.", links: [{ label: "Killercoda", href: "https://killercoda.com/playgrounds" }, { label: "kind", href: "https://kind.sigs.k8s.io/" }, { label: "Lab setup", href: "repo:drills/README.md" }] },
+        { id: "w0-vim", type: "setup", text: "Set up vim for YAML (`set ts=2 sw=2 et ai nu`). Learn: dd, yy, p, u, V + > / <, :set paste, /search.", links: [{ label: "Cheat sheet", href: "repo:CHEATSHEET.md" }] },
+      ],
+    },
+    {
+      id: "w1",
+      title: "Week 1 — Core concepts & container images",
+      domain: "Application Design and Build",
+      goal: "Create and inspect Pods, Deployments and Namespaces imperatively, and build, tag and export container images.",
+      tasks: [
+        { id: "w1-learn-core", type: "learn", text: "Course: core concepts. Pods, ReplicaSets, Deployments, Namespaces, labels and selectors.", links: [{ label: "Notes", href: "repo:notes/02-core-concepts.md" }] },
+        { id: "w1-imperative", type: "learn", text: "Imperative commands: `kubectl run`, `create deploy`, `expose`, `--dry-run=client -o yaml`, `kubectl explain --recursive`.", links: [{ label: "kubectl quick reference", href: "https://kubernetes.io/docs/reference/kubectl/quick-reference/" }] },
+        { id: "w1-images", type: "learn", text: "Container images: Dockerfile basics (FROM, COPY, RUN, CMD vs ENTRYPOINT, ENV, USER). Build, tag, push and save with both docker and podman.", yield: "high", links: [{ label: "podman", href: "https://docs.podman.io/en/latest/Commands.html" }, { label: "docker", href: "https://docs.docker.com/reference/cli/docker/" }] },
+        { id: "w1-drills", type: "drill", text: "Drills: Application Design and Build, 1.1 – 1.6.", links: [{ label: "Drills", href: "repo:drills/01-design-and-build.md" }] },
+        { id: "w1-speed", type: "practice", text: "Speed run: create 10 different Pods/Deployments from scratch (env vars, labels, ports, commands). Aim for under 60s each.", links: [] },
+        { id: "w1-check", type: "checkpoint", text: "Checkpoint: without docs, write a Pod with 2 labels, an env var, a command and resource requests in under 2 minutes.", links: [] },
+      ],
+    },
+    {
+      id: "w2",
+      title: "Week 2 — Workloads, multi-container Pods & storage",
+      domain: "Application Design and Build",
+      goal: "Pick the right workload for a task, combine containers in a Pod, and persist data.",
+      tasks: [
+        { id: "w2-workloads", type: "learn", text: "Workloads: Deployment vs DaemonSet vs StatefulSet vs Job vs CronJob. Know when to use each.", links: [{ label: "Notes", href: "repo:notes/06-pod-design.md" }] },
+        { id: "w2-jobs", type: "learn", text: "Jobs and CronJobs: completions, parallelism, backoffLimit, activeDeadlineSeconds, ttlSecondsAfterFinished, concurrencyPolicy, history limits.", yield: "high", links: [{ label: "Jobs", href: "https://kubernetes.io/docs/concepts/workloads/controllers/job/" }, { label: "CronJobs", href: "https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/" }] },
+        { id: "w2-multi", type: "learn", text: "Multi-container patterns: init containers, native sidecars (`restartPolicy: Always` on an init container), a shared emptyDir.", yield: "high", links: [{ label: "Notes", href: "repo:notes/04-multi-container-pods.md" }, { label: "Sidecars", href: "https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/" }] },
+        { id: "w2-storage", type: "learn", text: "Volumes: emptyDir, hostPath, PV, PVC, StorageClass, access modes, reclaim policy, binding rules.", links: [{ label: "Notes", href: "repo:notes/08-state-persistence.md" }, { label: "PV docs", href: "https://kubernetes.io/docs/concepts/storage/persistent-volumes/" }] },
+        { id: "w2-drills", type: "drill", text: "Drills: Application Design and Build, 1.7 – 1.12.", links: [{ label: "Drills", href: "repo:drills/01-design-and-build.md" }] },
+        { id: "w2-killercoda", type: "practice", text: "Killercoda: work through the CKAD scenarios on workloads, multi-container Pods and storage.", links: [{ label: "Killercoda CKAD", href: "https://killercoda.com/ckad" }] },
+        { id: "w2-check", type: "checkpoint", text: "Checkpoint: in under 5 minutes, write a Pod with an init container, a sidecar sharing an emptyDir, and a PVC mount.", links: [] },
+      ],
+    },
+    {
+      id: "w3",
+      title: "Week 3 — Configuration & security",
+      domain: "Application Environment, Configuration and Security (25%)",
+      goal: "Cover the heaviest domain: config injection, resource governance, Pod security and identity.",
+      tasks: [
+        { id: "w3-config", type: "learn", text: "ConfigMaps and Secrets: create them imperatively, then consume via env, envFrom and volume (including a single key via subPath).", yield: "high", links: [{ label: "Notes", href: "repo:notes/03-configuration.md" }] },
+        { id: "w3-resources", type: "learn", text: "Requests and limits, LimitRange, ResourceQuota. Understand why a Pod is rejected or stays Pending.", yield: "high", links: [{ label: "Resources", href: "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" }, { label: "Quotas", href: "https://kubernetes.io/docs/concepts/policy/resource-quotas/" }] },
+        { id: "w3-secctx", type: "learn", text: "SecurityContext: runAsUser/Group, runAsNonRoot, fsGroup, readOnlyRootFilesystem, allowPrivilegeEscalation, capabilities add/drop. Know which fields go at Pod level and which at container level.", yield: "high", links: [{ label: "Notes", href: "repo:notes/09-security.md" }, { label: "Docs", href: "https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" }] },
+        { id: "w3-sa-rbac", type: "learn", text: "ServiceAccounts, Roles and RoleBindings: create a SA, assign it to a Deployment, `kubectl create token`, `kubectl auth can-i --as=system:serviceaccount:<ns>:<sa>`.", links: [{ label: "RBAC", href: "https://kubernetes.io/docs/reference/access-authn-authz/rbac/" }] },
+        { id: "w3-crd", type: "learn", text: "CRDs and Operators: discover them (`kubectl get crd`, `kubectl explain <kind>`) and create a custom resource from an existing CRD.", links: [{ label: "Custom resources", href: "https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/" }] },
+        { id: "w3-authn", type: "learn", text: "Authentication, authorization and admission control at concept level. Know the request flow and what an admission controller can reject.", yield: "low", links: [{ label: "Admission", href: "https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/" }] },
+        { id: "w3-drills", type: "drill", text: "Drills: Application Environment, Configuration and Security, 2.1 – 2.10.", links: [{ label: "Drills", href: "repo:drills/02-config-and-security.md" }] },
+        { id: "w3-check", type: "checkpoint", text: "Checkpoint: from memory, run a Deployment as non-root with all capabilities dropped and NET_BIND_SERVICE added, using a custom ServiceAccount and a Secret mounted as env.", links: [] },
+      ],
+    },
+    {
+      id: "w4",
+      title: "Week 4 — Deployments, Helm & Kustomize",
+      domain: "Application Deployment",
+      goal: "Roll out, roll back and package applications, and recognise deployment strategies even when the task doesn't name them.",
+      tasks: [
+        { id: "w4-rollouts", type: "learn", text: "Rolling updates: strategy, maxSurge/maxUnavailable, `set image`, `rollout status/history/undo --to-revision/pause/resume/restart`.", yield: "high", links: [{ label: "Deployments", href: "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" }] },
+        { id: "w4-strategies", type: "learn", text: "Blue/green (switch a Service selector) and canary (shared label + replica ratio). Practise spotting them from a description alone.", yield: "high", links: [{ label: "Canary docs", href: "https://kubernetes.io/docs/concepts/workloads/management/" }] },
+        { id: "w4-helm", type: "learn", text: "Helm: repo add/update, search, install with `--set` / `-f`, upgrade, rollback, history, list -A, uninstall, template, show values.", yield: "high", links: [{ label: "Notes", href: "repo:notes/10-helm.md" }, { label: "Using Helm", href: "https://helm.sh/docs/intro/using_helm/" }] },
+        { id: "w4-kustomize", type: "learn", text: "Kustomize: base + overlays, namespace/namePrefix/labels, images, replicas, patches, generators, `kubectl apply -k` vs `kubectl kustomize`.", links: [{ label: "Notes", href: "repo:notes/11-kustomize.md" }, { label: "Docs", href: "https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/" }] },
+        { id: "w4-drills", type: "drill", text: "Drills: Application Deployment, 3.1 – 3.8.", links: [{ label: "Drills", href: "repo:drills/03-deployment.md" }] },
+        { id: "w4-check", type: "checkpoint", text: "Checkpoint: change an image, watch the rollout, roll back to a specific revision, then upgrade and roll back a Helm release. No docs.", links: [] },
+      ],
+    },
+    {
+      id: "w5",
+      title: "Week 5 — Networking & observability",
+      domain: "Services and Networking · Application Observability and Maintenance",
+      goal: "Expose applications end to end, restrict traffic, and debug anything that doesn't work.",
+      tasks: [
+        { id: "w5-services", type: "learn", text: "Services: ClusterIP, NodePort, LoadBalancer, headless, and port vs targetPort vs nodePort. Troubleshoot empty endpoints (selector or port mismatch).", yield: "high", links: [{ label: "Notes", href: "repo:notes/07-network.md" }] },
+        { id: "w5-ingress", type: "learn", text: "Ingress: ingressClassName, host and path rules, pathType (Prefix/Exact), TLS, default backend. Chain Deployment → Service → Ingress.", yield: "high", links: [{ label: "Ingress", href: "https://kubernetes.io/docs/concepts/services-networking/ingress/" }] },
+        { id: "w5-netpol", type: "learn", text: "NetworkPolicies: default deny, allow from pod / namespace / ipBlock, egress with DNS, and how podSelector and namespaceSelector combine (AND vs OR).", yield: "high", links: [{ label: "NetworkPolicies", href: "https://kubernetes.io/docs/concepts/services-networking/network-policies/" }] },
+        { id: "w5-probes", type: "learn", text: "Probes: liveness, readiness and startup with exec / httpGet / tcpSocket, and their timing fields.", yield: "high", links: [{ label: "Notes", href: "repo:notes/05-observability.md" }, { label: "Docs", href: "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/" }] },
+        { id: "w5-debug", type: "learn", text: "Debugging: describe, events (sorted), logs (`-c`, `-p`, `-f`, `-l`), exec, `kubectl debug`, `kubectl top`, and a temporary curl/busybox Pod.", links: [{ label: "Debug apps", href: "https://kubernetes.io/docs/tasks/debug/debug-application/" }] },
+        { id: "w5-deprecations", type: "learn", text: "API deprecations: `kubectl api-resources`, `kubectl explain`, the deprecation guide. Update a manifest that uses a removed API version.", links: [{ label: "Deprecation guide", href: "https://kubernetes.io/docs/reference/using-api/deprecation-guide/" }] },
+        { id: "w5-drills-net", type: "drill", text: "Drills: Services and Networking, 4.1 – 4.8.", links: [{ label: "Drills", href: "repo:drills/04-services-and-networking.md" }] },
+        { id: "w5-drills-obs", type: "drill", text: "Drills: Observability and Maintenance, 5.1 – 5.7.", links: [{ label: "Drills", href: "repo:drills/05-observability.md" }] },
+        { id: "w5-check", type: "checkpoint", text: "Checkpoint: in under 8 minutes, expose a Deployment through a Service and an Ingress on a host and path, and allow traffic only from Pods labelled `role=frontend`.", links: [] },
+      ],
+    },
+    {
+      id: "w6",
+      title: "Week 6 — Speed & mixed practice",
+      goal: "Turn knowledge into speed. Tasks in the exam mix domains, so practise them mixed.",
+      tasks: [
+        { id: "w6-mixed", type: "drill", text: "Mixed exam-style scenarios, timed. Every one solved within its target time.", links: [{ label: "Scenarios", href: "repo:drills/06-mixed-scenarios.md" }] },
+        { id: "w6-course-mocks", type: "practice", text: "Your course's practice tests / mock exams, timed, in exam conditions.", links: [] },
+        { id: "w6-exercises", type: "practice", text: "Sweep the community CKAD exercises. Skip what's out of scope and drill what you hesitate on.", links: [{ label: "CKAD-exercises", href: "https://github.com/dgkanatsios/CKAD-exercises" }] },
+        { id: "w6-docs", type: "practice", text: "Docs navigation drill: find the example YAML for Ingress, NetworkPolicy, PVC, probes, SecurityContext and CronJob in under 30s each.", links: [{ label: "kubernetes.io/docs", href: "https://kubernetes.io/docs/home/" }] },
+        { id: "w6-redo", type: "practice", text: "Clear your redo list. Every failed drill solved twice, cleanly.", links: [] },
+        { id: "w6-cheatsheet", type: "practice", text: "Write your own one-page cheat sheet by hand. Writing it is how you memorise it.", links: [{ label: "Reference", href: "repo:CHEATSHEET.md" }] },
+      ],
+    },
+    {
+      id: "w7",
+      title: "Week 7 — Exam simulation #1",
+      goal: "Find your real weak spots under exam pressure, then fix them.",
+      tasks: [
+        { id: "w7-killer-a", type: "mock", text: "killer.sh session 1: the full 2 hours in one sitting, exam rules, no notes, allowed docs only.", links: [{ label: "killer.sh", href: "https://killer.sh/ckad" }] },
+        { id: "w7-review", type: "practice", text: "Within the 36h access window, go through every solution, including the ones you got right. There's often a faster way.", links: [] },
+        { id: "w7-redo", type: "practice", text: "Redo every question you lost points on, from scratch, in the same environment.", links: [] },
+        { id: "w7-remediate", type: "practice", text: "Remediation: go back to the notes and drills for the 2 weakest domains.", links: [] },
+        { id: "w7-mock2", type: "mock", text: "One more timed mock (course or mixed scenarios) to confirm the fixes.", links: [] },
+      ],
+    },
+    {
+      id: "w8",
+      title: "Week 8 — Simulation #2 & exam",
+      goal: "Confirm you're ready, prepare the environment, and walk in rested.",
+      tasks: [
+        { id: "w8-killer-b", type: "mock", text: "killer.sh session 2 (a different question set): full 2 hours, exam rules.", links: [{ label: "killer.sh", href: "https://killer.sh/ckad" }] },
+        { id: "w8-review", type: "practice", text: "Review and redo every lost point.", links: [] },
+        { id: "w8-gates", type: "checkpoint", text: "Every readiness gate below is green. If one isn't, reschedule. Don't gamble.", links: [] },
+        { id: "w8-env", type: "setup", text: "Do the exam environment check: system check, PSI Secure Browser, one keyboard layout, layout-switch hotkeys disabled, clean desk, ID.", links: [{ label: "Exam day", href: "repo:EXAM-DAY.md" }] },
+        { id: "w8-light", type: "practice", text: "Last 48 hours: only light review (cheat sheet + redo list). No new topics.", links: [] },
+        { id: "w8-exam", type: "exam", text: "Take the exam.", links: [{ label: "Exam-day playbook", href: "repo:EXAM-DAY.md" }] },
+      ],
+    },
+  ],
+  gates: [
+    { id: "g-killer", text: "Finished a full killer.sh session within 2 hours with at least ~80% of the points. It's a rule of thumb, not an official threshold." },
+    { id: "g-drills", text: "Every drill in this repo solved without notes within its target time." },
+    { id: "g-e2e", text: "Deployment → Service → Ingress + NetworkPolicy end to end in under 8 minutes." },
+    { id: "g-rollout", text: "set image / rollout undo / helm upgrade / helm rollback without hesitating." },
+    { id: "g-docs", text: "Can find any example YAML in the allowed docs in under 30 seconds." },
+    { id: "g-images", text: "Can build, tag and export an image with docker or podman without looking anything up." },
+    { id: "g-env", text: "The exam environment check is done and your system passes." },
+  ],
+};
+
+if (typeof module !== "undefined") module.exports = ROADMAP;

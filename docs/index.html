@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CKAD Roadmap</title>
+<meta name="description" content="An 8-week, checkbox-driven roadmap to pass the Certified Kubernetes Application Developer (CKAD) exam.">
+<style>
+  :root {
+    --bg: #f7f8fa; --surface: #ffffff; --surface-2: #f1f3f6; --border: #e2e5ea;
+    --text: #17202c; --muted: #5b6676; --accent: #2f6fe4; --accent-soft: #e6eefc;
+    --ok: #1a7f4b; --ok-soft: #e3f4ea; --warn: #9a5b00; --warn-soft: #fdf1dc;
+    --code-bg: #eef1f5; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f141b; --surface: #161d26; --surface-2: #1c2530; --border: #2a3441;
+      --text: #e6ebf1; --muted: #9aa6b5; --accent: #6c9cff; --accent-soft: #1d2a44;
+      --ok: #4cc38a; --ok-soft: #15301f; --warn: #f0b45a; --warn-soft: #33270f;
+      --code-bg: #232d39; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f141b; --surface: #161d26; --surface-2: #1c2530; --border: #2a3441;
+    --text: #e6ebf1; --muted: #9aa6b5; --accent: #6c9cff; --accent-soft: #1d2a44;
+    --ok: #4cc38a; --ok-soft: #15301f; --warn: #f0b45a; --warn-soft: #33270f;
+    --code-bg: #232d39; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font: .86em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+
+  header h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.01em; }
+  header p { margin: 0; color: var(--muted); max-width: 62ch; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 28px; font-size: .9rem; }
+  .topbar nav { display: flex; gap: 16px; flex-wrap: wrap; }
+  .icon-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+  .summary .card { padding: 18px 20px; }
+  .label { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  .big { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 2px 0 8px; }
+  .bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s ease; }
+  .bar.done > span { background: var(--ok); }
+  .hint { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+  input[type="date"] { font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; margin-top: 6px; }
+
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; padding: 0; list-style: none; }
+  .facts li { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 4px 12px; font-size: .85rem; color: var(--muted); }
+  .facts b { color: var(--text); font-weight: 600; }
+
+  h2 { font-size: 1.15rem; margin: 36px 0 12px; }
+  .domains { padding: 16px 20px; }
+  .domain { display: grid; grid-template-columns: 1fr 44px; gap: 4px 12px; align-items: center; margin: 8px 0; font-size: .92rem; }
+  .domain .bar { grid-column: 1 / -1; height: 6px; }
+  .domain .pct { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .rules { margin: 0; padding: 16px 20px 16px 40px; }
+  .rules li { margin: 6px 0; }
+
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 36px 0 12px; }
+  .toolbar h2 { margin: 0; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); cursor: pointer; }
+
+  details.week { margin: 12px 0; }
+  details.week > summary { list-style: none; cursor: pointer; padding: 16px 20px; display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; }
+  details.week > summary::-webkit-details-marker { display: none; }
+  .week-title { font-weight: 650; font-size: 1.02rem; }
+  .week-meta { color: var(--muted); font-size: .86rem; grid-column: 1 / 2; }
+  .week-count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; grid-row: 1 / 3; grid-column: 2; text-align: right; }
+  .week-count .bar { width: 96px; margin-top: 6px; height: 6px; }
+  .now-pill { display: inline-block; margin-left: 8px; font-size: .72rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 99px; vertical-align: 2px; }
+  .now-pill[hidden] { display: none; }
+  .week.complete .week-title::after { content: " ✓"; color: var(--ok); }
+  .week-body { padding: 0 20px 16px; border-top: 1px solid var(--border); }
+  .goal { color: var(--muted); font-size: .92rem; margin: 14px 0 6px; }
+
+  ul.tasks { list-style: none; margin: 0; padding: 0; }
+  ul.tasks li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  ul.tasks li:last-child { border-bottom: 0; }
+  ul.tasks input[type="checkbox"] { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ok); cursor: pointer; }
+  ul.tasks label { cursor: pointer; }
+  ul.tasks li.checked .text { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border); }
+  .hide-done ul.tasks li.checked { display: none; }
+  .tag { display: inline-block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 1px 7px; border-radius: 5px; margin-right: 6px; background: var(--surface-2); color: var(--muted); vertical-align: 1px; }
+  .tag.drill, .tag.mock { background: var(--accent-soft); color: var(--accent); }
+  .tag.checkpoint, .tag.exam { background: var(--ok-soft); color: var(--ok); }
+  .tag.high { background: var(--warn-soft); color: var(--warn); }
+  .links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 4px; font-size: .86rem; }
+
+  .gates { padding: 6px 20px; }
+  .gates-status { margin: 8px 0 0; font-weight: 600; }
+  .gates-status.go { color: var(--ok); }
+
+  footer { margin-top: 40px; color: var(--muted); font-size: .88rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .btn { font: inherit; font-size: .88rem; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.danger:hover { border-color: #d14343; color: #d14343; }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 1.6rem; }
+    .summary { grid-template-columns: 1fr; }
+    details.week > summary { grid-template-columns: 1fr; }
+    .week-count { grid-row: auto; grid-column: 1; text-align: left; }
+  }
+  @media print {
+    .topbar, .actions, .toolbar .toggle, input[type="date"] { display: none; }
+    details.week { break-inside: avoid; }
+    .card { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <nav>
+      <a id="repo-link" href="../">Repository</a>
+      <a href="big-picture.html">Kubernetes big picture</a>
+      <a data-repo="RESOURCES.md" href="../RESOURCES.md">Resources</a>
+      <a data-repo="EXAM-DAY.md" href="../EXAM-DAY.md">Exam day</a>
+    </nav>
+    <button class="icon-btn" id="theme-btn" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+
+  <header>
+    <h1>CKAD Roadmap</h1>
+    <p>8 weeks from zero to exam-ready. Every box is a concrete action. Tick them all and pass every readiness gate, and the exam won't surprise you.</p>
+  </header>
+
+  <section class="summary" aria-label="Progress">
+    <div class="card">
+      <div class="label">Overall progress</div>
+      <div class="big" id="overall-pct">0%</div>
+      <div class="bar" id="overall-bar"><span></span></div>
+      <div class="hint" id="overall-hint"></div>
+    </div>
+    <div class="card">
+      <div class="label"><label for="exam-date">Exam date</label></div>
+      <div class="big" id="countdown">—</div>
+      <input type="date" id="exam-date">
+      <div class="hint" id="pace-hint">Set your exam date to see the weekly schedule.</div>
+    </div>
+  </section>
+
+  <ul class="facts" id="facts"></ul>
+
+  <h2>Curriculum weights</h2>
+  <div class="card domains" id="domains"></div>
+
+  <h2>Daily rules</h2>
+  <ol class="card rules" id="rules"></ol>
+
+  <div class="toolbar">
+    <h2>The plan</h2>
+    <label class="toggle"><input type="checkbox" id="hide-done"> Hide completed</label>
+  </div>
+  <div id="weeks"></div>
+
+  <h2>Readiness gates</h2>
+  <div class="card gates">
+    <ul class="tasks" id="gates"></ul>
+    <p class="gates-status" id="gates-status"></p>
+  </div>
+
+  <footer>
+    <p>Your progress is saved in this browser only (localStorage). It isn't sent anywhere, and it won't follow you to another device. Export it to back it up or move it.</p>
+    <div class="actions">
+      <button class="btn" id="export-btn" type="button">Export progress</button>
+      <button class="btn" id="import-btn" type="button">Import progress</button>
+      <input type="file" id="import-file" accept="application/json" hidden>
+      <button class="btn" type="button" onclick="window.print()">Print</button>
+      <button class="btn danger" id="reset-btn" type="button">Reset</button>
+    </div>
+    <p id="updated"></p>
+  </footer>
+</div>
+
+<script src="roadmap.js"></script>
+<script>
+(function () {
+  "use strict";
+  var KEY = "ckad-roadmap:v1";
+  var R = window.ROADMAP;
+
+  // Links to repo files: on GitHub Pages (<user>.github.io/<repo>/) point to the rendered file on github.com;
+  // opened locally, fall back to the relative path.
+  var repoBase = "../";
+  if (/\.github\.io$/.test(location.hostname)) {
+    var user = location.hostname.split(".")[0];
+    var repo = location.pathname.split("/").filter(Boolean)[0];
+    if (repo) repoBase = "https://github.com/" + user + "/" + repo + "/blob/main/";
+    document.getElementById("repo-link").href = "https://github.com/" + user + "/" + (repo || "");
+  }
+  function href(h) { return h.indexOf("repo:") === 0 ? repoBase + h.slice(5) : h; }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-repo]"), function (a) { a.href = href("repo:" + a.getAttribute("data-repo")); });
+
+  // State lives only in this browser; storage may be unavailable (private mode, blocked site data).
+  var state = { done: {}, examDate: "", hideDone: false };
+  function load() {
+    try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && typeof s === "object") state = Object.assign(state, s); } catch (e) {}
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function md(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+
+  var TYPE_LABEL = { learn: "Learn", drill: "Drill", practice: "Practice", mock: "Mock", checkpoint: "Checkpoint", setup: "Setup", exam: "Exam" };
+
+  function taskHtml(t) {
+    var links = (t.links || []).map(function (l) {
+      var ext = l.href.indexOf("repo:") !== 0;
+      return '<a href="' + esc(href(l.href)) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + esc(l.label) + "</a>";
+    }).join("");
+    var tags = (t.type ? '<span class="tag ' + t.type + '">' + TYPE_LABEL[t.type] + "</span>" : "") +
+               (t.yield === "high" ? '<span class="tag high">High yield</span>' : "") +
+               (t.yield === "low" ? '<span class="tag">Concept only</span>' : "");
+    return '<li data-id="' + t.id + '"><input type="checkbox" id="cb-' + t.id + '">' +
+      '<div><label for="cb-' + t.id + '">' + tags + '<span class="text">' + md(t.text) + "</span></label>" +
+      (links ? '<div class="links">' + links + "</div>" : "") + "</div></li>";
+  }
+
+  function render() {
+    var e = R.exam;
+    document.getElementById("facts").innerHTML = [
+      ["Kubernetes", e.kubernetes], ["Duration", e.duration], ["Format", e.tasks], ["Pass", e.passScore], ["Price", e.price], ["Valid", e.validity]
+    ].map(function (f) { return "<li>" + esc(f[0]) + ": <b>" + esc(f[1]) + "</b></li>"; }).join("");
+
+    document.getElementById("domains").innerHTML = R.domains.map(function (d) {
+      return '<div class="domain"><span>' + esc(d.name) + '</span><span class="pct">' + d.weight + '%</span><div class="bar"><span style="width:' + (d.weight * 4) + '%"></span></div></div>';
+    }).join("");
+
+    document.getElementById("rules").innerHTML = R.rules.map(function (r) { return "<li>" + md(r) + "</li>"; }).join("");
+
+    document.getElementById("weeks").innerHTML = R.weeks.map(function (w) {
+      return '<details class="card week" id="' + w.id + '"><summary>' +
+        '<span class="week-title">' + esc(w.title) + '<span class="now-pill" hidden>This week</span></span>' +
+        '<span class="week-count"><span class="n"></span><div class="bar"><span></span></div></span>' +
+        '<span class="week-meta">' + esc(w.domain || "") + '<span class="dates"></span></span>' +
+        '</summary><div class="week-body"><p class="goal">' + md(w.goal) + '</p><ul class="tasks">' +
+        w.tasks.map(taskHtml).join("") + "</ul></div></details>";
+    }).join("");
+
+    document.getElementById("gates").innerHTML = R.gates.map(taskHtml).join("");
+    document.getElementById("updated").textContent = "Roadmap content last updated " + R.updated + ".";
+  }
+
+  function allTasks() { return R.weeks.reduce(function (a, w) { return a.concat(w.tasks); }, []); }
+
+  function setBar(el, pct) {
+    el.querySelector("span").style.width = pct + "%";
+    el.classList.toggle("done", pct === 100);
+  }
+
+  function refresh() {
+    Array.prototype.forEach.call(document.querySelectorAll("li[data-id]"), function (li) {
+      var on = !!state.done[li.getAttribute("data-id")];
+      li.classList.toggle("checked", on);
+      li.querySelector("input").checked = on;
+    });
+
+    var tasks = allTasks();
+    var n = tasks.filter(function (t) { return state.done[t.id]; }).length;
+    var pct = Math.round((n / tasks.length) * 100);
+    document.getElementById("overall-pct").textContent = pct + "%";
+    setBar(document.getElementById("overall-bar"), pct);
+    document.getElementById("overall-hint").textContent = n + " of " + tasks.length + " tasks done";
+
+    R.weeks.forEach(function (w) {
+      var el = document.getElementById(w.id);
+      var d = w.tasks.filter(function (t) { return state.done[t.id]; }).length;
+      el.querySelector(".week-count .n").textContent = d + " / " + w.tasks.length;
+      setBar(el.querySelector(".week-count .bar"), Math.round((d / w.tasks.length) * 100));
+      el.classList.toggle("complete", d === w.tasks.length);
+    });
+
+    var g = R.gates.filter(function (t) { return state.done[t.id]; }).length;
+    var gs = document.getElementById("gates-status");
+    gs.textContent = g === R.gates.length ? "All gates green. You're ready." : g + " of " + R.gates.length + " gates green. Book or keep the date only when all are.";
+    gs.classList.toggle("go", g === R.gates.length);
+
+    document.body.classList.toggle("hide-done", !!state.hideDone);
+    document.getElementById("hide-done").checked = !!state.hideDone;
+    schedule();
+  }
+
+  // Week k (1–8) ends (9-k) weeks before the exam; week 8 ends on exam day. Week 0 is "before week 1".
+  function schedule() {
+    var input = document.getElementById("exam-date");
+    input.value = state.examDate || "";
+    var cd = document.getElementById("countdown"), hint = document.getElementById("pace-hint");
+    var pills = document.querySelectorAll(".now-pill");
+    Array.prototype.forEach.call(pills, function (p) { p.hidden = true; });
+    Array.prototype.forEach.call(document.querySelectorAll(".week .dates"), function (s) { s.textContent = ""; });
+    if (!state.examDate) { cd.textContent = "—"; hint.textContent = "Set your exam date to see the weekly schedule."; return; }
+
+    var exam = new Date(state.examDate + "T00:00:00");
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var days = Math.round((exam - today) / 864e5);
+    cd.textContent = days > 0 ? days + " days to go" : days === 0 ? "Exam day" : "Exam done";
+
+    var fmt = function (d) { return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }); };
+    var current = null;
+    R.weeks.forEach(function (w, i) {
+      if (i === 0) return;
+      var start = new Date(exam); start.setDate(exam.getDate() - (9 - i) * 7 + 1);
+      var end = new Date(start); end.setDate(start.getDate() + 6);
+      var el = document.getElementById(w.id);
+      el.querySelector(".dates").textContent = (w.domain ? " · " : "") + fmt(start) + " – " + fmt(end);
+      if (today >= start && today <= end) current = el;
+    });
+    var w1start = new Date(exam); w1start.setDate(exam.getDate() - 55);
+    if (!current && today < w1start && days > 0) current = document.getElementById("w0");
+    if (current) { current.querySelector(".now-pill").hidden = false; }
+
+    if (days > 56) hint.textContent = "More than 8 weeks out. Finish Week 0, then start Week 1 on " + fmt(w1start) + ".";
+    else if (days > 0) hint.textContent = current ? "You should be in: " + current.querySelector(".week-title").firstChild.textContent : "";
+    else hint.textContent = "";
+  }
+
+  function openCurrent() {
+    var target = document.querySelector(".now-pill:not([hidden])");
+    var el = target ? target.closest("details") : R.weeks.map(function (w) { return document.getElementById(w.id); }).filter(function (e) { return !e.classList.contains("complete"); })[0];
+    if (el) el.open = true;
+  }
+
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.matches("li[data-id] input")) {
+      var id = t.closest("li").getAttribute("data-id");
+      if (t.checked) state.done[id] = true; else delete state.done[id];
+    } else if (t.id === "exam-date") {
+      state.examDate = t.value;
+    } else if (t.id === "hide-done") {
+      state.hideDone = t.checked;
+    } else return;
+    save(); refresh();
+  });
+
+  document.getElementById("export-btn").addEventListener("click", function () {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "ckad-roadmap-progress.json";
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  document.getElementById("import-btn").addEventListener("click", function () { document.getElementById("import-file").click(); });
+  document.getElementById("import-file").addEventListener("change", function (ev) {
+    var f = ev.target.files[0]; if (!f) return;
+    f.text().then(function (txt) {
+      var s = JSON.parse(txt);
+      if (!s || typeof s.done !== "object") throw new Error("bad file");
+      state = { done: s.done, examDate: s.examDate || "", hideDone: !!s.hideDone };
+      save(); refresh(); openCurrent();
+    }).catch(function () { alert("That file doesn't look like an exported CKAD Roadmap progress file."); });
+    ev.target.value = "";
+  });
+  document.getElementById("reset-btn").addEventListener("click", function () {
+    if (!confirm("Clear all ticked tasks and your exam date?")) return;
+    state = { done: {}, examDate: "", hideDone: false };
+    save(); refresh();
+  });
+
+  var root = document.documentElement;
+  try { var th = localStorage.getItem(KEY + ":theme"); if (th) root.setAttribute("data-theme", th); } catch (e) {}
+  document.getElementById("theme-btn").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem(KEY + ":theme", next); } catch (e) {}
+  });
+
+  load(); render(); refresh(); openCurrent();
+})();
+</script>
+</body>
+</html>

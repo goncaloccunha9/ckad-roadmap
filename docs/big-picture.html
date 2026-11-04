@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes Big Picture</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 2rem 1rem;
+  line-height: 1.6;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* Typography */
+h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+h2 {
+  font-size: 1.6rem;
+  margin: 3rem 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #334155;
+  color: #f1f5f9;
+}
+h3 { font-size: 1.15rem; margin: 1.5rem 0 0.75rem; color: #e2e8f0; }
+h4 { font-size: 0.95rem; margin: 1rem 0 0.5rem; color: #cbd5e1; }
+p { margin-bottom: 0.75rem; color: #cbd5e1; }
+strong { color: #f1f5f9; }
+.subtitle { color: #94a3b8; font-size: 1rem; margin-bottom: 2rem; }
+
+/* Navigation */
+.nav {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #334155;
+  position: sticky;
+  top: 1rem;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  background: rgba(30, 41, 59, 0.95);
+}
+.nav-title { font-weight: 600; color: #f59e0b; margin-bottom: 0.75rem; font-size: 0.9rem; }
+.nav-links { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.nav-links a {
+  background: #0f172a; color: #cbd5e1; padding: 0.4rem 0.75rem;
+  border-radius: 6px; text-decoration: none; font-size: 0.82rem;
+  border: 1px solid #334155; transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-links a:hover { border-color: #8b5cf6; background: #1e1b4b; color: #fff; }
+
+/* Resource Cards - cleaner sizing */
+.card {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  border: 2px solid;
+  font-weight: 600;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.card-pod      { background: #1e3a8a30; border-color: #3b82f6; color: #93c5fd; }
+.card-deploy   { background: #581c8730; border-color: #a855f7; color: #d8b4fe; }
+.card-config   { background: #92400e30; border-color: #f59e0b; color: #fcd34d; }
+.card-net      { background: #064e3b30; border-color: #10b981; color: #86efac; }
+.card-storage  { background: #155e7530; border-color: #06b6d4; color: #67e8f9; }
+.card-security { background: #7f1d1d30; border-color: #ef4444; color: #fca5a5; }
+.card-node     { background: #37415130; border-color: #6b7280; color: #d1d5db; }
+.card-volume   { background: #78350f30; border-color: #eab308; color: #fde047; }
+
+/* Inline note (small italic text next to cards) */
+.note {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Box (main visual container) */
+.box {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.25rem 0;
+  border: 1px solid #334155;
+}
+.box-dark {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+  border: 1px solid #334155;
+}
+
+/* Row of cards (centered, wrappable) */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.row-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+/* Arrows */
+.arrow {
+  color: #8b5cf6;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.arrow-down {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #8b5cf6;
+  margin: 0.4rem 0;
+  line-height: 1;
+}
+.arrow-up {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0.75rem 0 0.4rem;
+  font-style: italic;
+}
+
+/* Connection (3-column relationship) */
+.connect {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  background: #0f172a;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  margin: 0.6rem 0;
+}
+.connect-left, .connect-right {
+  display: flex;
+  justify-content: center;
+}
+.connect-middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.connect-arrow {
+  font-size: 1.6rem;
+  color: #8b5cf6;
+  line-height: 1;
+}
+.connect-via {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.2rem;
+  word-break: break-word;
+}
+
+/* Subsection label inside box */
+.section-label {
+  font-size: 0.75rem;
+  color: #a5b4fc;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+.section-label-purple { color: #c4b5fd; }
+.section-label-amber  { color: #fcd34d; }
+
+/* Code blocks */
+pre {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+code {
+  background: #334155;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #a5b4fc;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+}
+pre code { background: none; padding: 0; color: #e2e8f0; font-size: 1em; }
+
+/* Callouts */
+.callout {
+  border-left: 4px solid;
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1.25rem 0;
+}
+.callout p { margin-bottom: 0.5rem; }
+.callout p:last-child { margin-bottom: 0; }
+.callout pre { margin-top: 0.5rem; }
+.callout-tip    { border-color: #10b981; background: #064e3b25; }
+.callout-warn   { border-color: #f59e0b; background: #92400e25; }
+.callout-danger { border-color: #ef4444; background: #7f1d1d25; }
+.callout-info   { border-color: #3b82f6; background: #1e3a8a25; }
+.callout-title  { font-weight: 600; margin-bottom: 0.5rem; }
+.callout-tip .callout-title    { color: #6ee7b7; }
+.callout-warn .callout-title   { color: #fcd34d; }
+.callout-danger .callout-title { color: #fca5a5; }
+.callout-info .callout-title   { color: #93c5fd; }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: #0f172a;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.88rem;
+}
+th {
+  background: #334155;
+  padding: 0.75rem;
+  text-align: left;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+td {
+  padding: 0.7rem 0.75rem;
+  border-top: 1px solid #334155;
+  color: #cbd5e1;
+  vertical-align: top;
+}
+td code { font-size: 0.85em; }
+
+/* Big picture cluster diagram */
+.cluster {
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border: 1px solid #4f46e5;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.25rem 0;
+}
+.cluster-frame {
+  border: 2px dashed #6366f1;
+  border-radius: 10px;
+  padding: 1.25rem;
+  background: rgba(99, 102, 241, 0.04);
+}
+.namespace {
+  border: 2px solid #475569;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+  background: rgba(71, 85, 105, 0.1);
+}
+.namespace-label {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Card grid (for "3 ways" sections) */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.method-card {
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+.method-card h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+}
+.method-card pre {
+  margin: 0.5rem 0;
+  font-size: 0.78rem;
+}
+.method-card p {
+  font-size: 0.82rem;
+  margin: 0.4rem 0 0;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 0.75rem 1.25rem;
+  flex-wrap: wrap;
+  background: #1e293b;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  margin-bottom: 1.5rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+}
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 2px solid;
+  flex-shrink: 0;
+}
+
+/* Section */
+.section { margin-bottom: 3rem; }
+
+/* ASCII art container (centered, monospace) */
+.ascii {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #cbd5e1;
+  white-space: pre;
+  margin: 0.75rem 0;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin: 3rem 0 1rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  padding: 1.5rem;
+  border-top: 1px solid #334155;
+}
+
+@media (max-width: 768px) {
+  body { padding: 1rem 0.5rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.3rem; }
+  .nav { padding: 1rem; }
+  .nav-links a { font-size: 0.72rem; padding: 0.3rem 0.55rem; }
+  .connect { grid-template-columns: 1fr; gap: 0.5rem; }
+  .connect-arrow { transform: rotate(90deg); }
+  .box, .cluster, .cluster-frame { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<p style="font-size:0.85rem;margin-bottom:1rem;"><a href="index.html" style="color:#a5b4fc;text-decoration:none;">← CKAD Roadmap</a></p>
+
+<h1>Kubernetes Big Picture</h1>
+<p class="subtitle">A complete visual overview of ALL Kubernetes resources and how they relate &bull; Single reference for CKAD</p>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-title">📍 Quick Navigation</div>
+  <div class="nav-links">
+    <a href="#overview">1. Overview</a>
+    <a href="#pod">2. Pod</a>
+    <a href="#workloads">3. Workloads</a>
+    <a href="#config">4. Config & Secrets</a>
+    <a href="#network">5. Networking</a>
+    <a href="#storage">6. Storage</a>
+    <a href="#security">7. Security/RBAC</a>
+    <a href="#scheduling">8. Scheduling</a>
+    <a href="#observability">9. Observability</a>
+    <a href="#multicontainer">10. Multi-container</a>
+    <a href="#helm">11. Helm</a>
+    <a href="#docker">12. Docker</a>
+    <a href="#cheatsheet">13. Cheat Sheet</a>
+  </div>
+</nav>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#3b82f6;background:#1e3a8a30"></span>Pod / Container</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#a855f7;background:#581c8730"></span>Workload</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#f59e0b;background:#92400e30"></span>Config</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#10b981;background:#064e3b30"></span>Network</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#06b6d4;background:#155e7530"></span>Storage</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#ef4444;background:#7f1d1d30"></span>Security</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#6b7280;background:#37415130"></span>Node / Cluster</div>
+  <div class="legend-item"><span class="legend-swatch" style="border-color:#eab308;background:#78350f30"></span>Volume</div>
+</div>
+
+<!-- ============================================================
+PART: OVERVIEW
+============================================================ -->
+<section id="overview" class="section">
+<h2>1. General Overview</h2>
+
+<p>Before diving into the details, here is the "treasure map" of Kubernetes. Everything else is a detail of this hierarchy.</p>
+
+<div class="cluster">
+  <div class="section-label">🌐 Kubernetes Cluster</div>
+
+  <div class="cluster-frame">
+    <div class="section-label">Cluster-scoped (no namespace)</div>
+    <div class="row">
+      <span class="card card-node">Node</span>
+      <span class="card card-storage">PersistentVolume</span>
+      <span class="card card-storage">StorageClass</span>
+      <span class="card card-security">ClusterRole</span>
+      <span class="card card-security">ClusterRoleBinding</span>
+      <span class="card card-node">Namespace</span>
+    </div>
+
+    <div class="namespace">
+      <div class="namespace-label">📦 Namespace: default</div>
+
+      <div class="section-label section-label-purple">Workload Controllers (manage Pods)</div>
+      <div class="row">
+        <span class="card card-deploy">Deployment</span>
+        <span class="card card-deploy">StatefulSet</span>
+        <span class="card card-deploy">DaemonSet</span>
+        <span class="card card-deploy">Job</span>
+        <span class="card card-deploy">CronJob</span>
+      </div>
+
+      <div class="arrow-down">↓ create</div>
+      <div class="row">
+        <span class="card card-deploy">ReplicaSet</span>
+        <span class="note">(intermediate layer for Deployments)</span>
+      </div>
+
+      <div class="arrow-down">↓ creates</div>
+      <div class="row" style="background:#1e3a8a30; padding:0.75rem; border-radius:8px; border:1px solid #3b82f6;">
+        <span class="card card-pod">Pod</span>
+        <span class="note" style="color:#93c5fd;">← THE CENTRE OF EVERYTHING</span>
+      </div>
+
+      <div class="arrow-up">↑ The Pod CONSUMES these resources ↑</div>
+      <div class="row">
+        <span class="card card-config">ConfigMap</span>
+        <span class="card card-config">Secret</span>
+        <span class="card card-security">ServiceAccount</span>
+        <span class="card card-storage">PVC</span>
+      </div>
+
+      <div class="arrow-up">↑ The Pod is EXPOSED through these ↑</div>
+      <div class="row">
+        <span class="card card-net">Service</span>
+        <span class="card card-net">Ingress</span>
+        <span class="card card-net">NetworkPolicy</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-info">
+  <div class="callout-title">💡 Mental Model</div>
+  <p>The <strong>Pod</strong> is the centre of everything. <strong>Everything "above"</strong> (Deployments, etc.) creates Pods. <strong>Everything "below"</strong> (Services, Ingress) helps Pods communicate. <strong>ConfigMaps/Secrets/PVCs</strong> feed the Pod with data.</p>
+</div>
+
+</section>
+
+<!-- ============================================================
+PART: POD
+============================================================ -->
+<section id="pod" class="section">
+<h2>2. Pod - The centre of everything</h2>
+
+<p>The Pod is the <strong>smallest unit</strong> you can create in Kubernetes. Everything else exists to create, configure, expose or monitor Pods.</p>
+
+<h3>Anatomy of a Pod</h3>
+
+<div class="ascii">┌─────────────────────────── POD ──────────────────────────────┐
+│                                                              │
+│  metadata: { name, labels, annotations, namespace }          │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  CONTAINERS (1 or more)                                 │ │
+│  │  ┌─────────────────┐   ┌─────────────────┐              │ │
+│  │  │ Container 1     │   │ Container 2     │              │ │
+│  │  │ - image         │   │ - image         │              │ │
+│  │  │ - command       │   │ - command       │              │ │
+│  │  │ - env           │   │ - resources     │              │ │
+│  │  │ - volumeMounts  │   │ - probes        │              │ │
+│  │  │ - ports         │   │ - securityCtx   │              │ │
+│  │  └─────────────────┘   └─────────────────┘              │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  initContainers: [...]  (run before the containers)          │
+│  volumes: [...]         (referenced by volumeMounts)         │
+│  serviceAccountName: my-sa                                   │
+│  nodeSelector / affinity / tolerations                       │
+│  securityContext: { runAsUser, fsGroup }                     │
+│  restartPolicy: Always | OnFailure | Never                   │
+└──────────────────────────────────────────────────────────────┘</div>
+
+<h3>What a Pod CONSUMES (external resources)</h3>
+
+<div class="box">
+  <div class="connect">
+    <div class="connect-left"><span class="card card-config">ConfigMap</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">env / envFrom / volume</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-config">Secret</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">env / envFrom / volume</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-storage">PVC</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">volumes.persistentVolumeClaim.claimName</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-security">ServiceAccount</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">spec.serviceAccountName</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-node">Node</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">scheduler (resources/affinity/taints)</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+</div>
+
+<h3>A typical Pod that uses ALL the resources</h3>
+
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+  namespace: default
+  labels:
+    app: web
+spec:
+  serviceAccountName: web-sa              # ← ServiceAccount
+  containers:
+  - name: web
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    envFrom:
+    - configMapRef:
+        name: app-config                  # ← ConfigMap
+    env:
+    - name: DB_PASS
+      valueFrom:
+        secretKeyRef:                     # ← Secret
+          name: db-credentials
+          key: password
+    volumeMounts:
+    - name: data
+      mountPath: /var/www/html
+    resources:                            # ← Resources
+      requests: { memory: 128Mi, cpu: 100m }
+      limits:   { memory: 256Mi, cpu: 500m }
+    livenessProbe:                        # ← Probes
+      httpGet: { path: /, port: 80 }
+  volumes:
+  - name: data
+    persistentVolumeClaim:                # ← PVC
+      claimName: my-pvc
+  nodeSelector:                           # ← Scheduling
+    disktype: ssd</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: WORKLOADS
+============================================================ -->
+<section id="workloads" class="section">
+<h2>3. Workloads - Who creates Pods?</h2>
+
+<p>You rarely create a Pod directly. You use a <strong>controller</strong> that manages the lifecycle of Pods.</p>
+
+<h3>Hierarchy: Deployment → ReplicaSet → Pod</h3>
+
+<div class="box">
+  <div class="row"><span class="card card-deploy">Deployment</span></div>
+  <div class="arrow-down">↓ manages</div>
+  <div class="row"><span class="card card-deploy">ReplicaSet</span></div>
+  <div class="arrow-down">↓ manages N replicas</div>
+  <div class="row"><span class="card card-pod">Pod</span></div>
+  <div class="arrow-down">↓ contains</div>
+  <div class="row"><span class="card card-pod">Containers</span></div>
+</div>
+
+<h3>Workload types</h3>
+
+<table>
+<tr><th>Type</th><th>When to use</th><th>Creates</th></tr>
+<tr><td><strong>Deployment</strong></td><td>Stateless apps (web, API)</td><td>ReplicaSet → Pods</td></tr>
+<tr><td><strong>StatefulSet</strong></td><td>Stateful apps (DBs, queues)</td><td>Pods with stable identity</td></tr>
+<tr><td><strong>DaemonSet</strong></td><td>One Pod per node (logs, monitoring)</td><td>1 Pod per node</td></tr>
+<tr><td><strong>Job</strong></td><td>A task that runs to completion</td><td>Pods (1+)</td></tr>
+<tr><td><strong>CronJob</strong></td><td>Scheduled Jobs (cron)</td><td>Jobs → Pods</td></tr>
+</table>
+
+<h3>How a Deployment creates Pods (selector + template)</h3>
+
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 3                    # how many Pods to create
+  selector:                      ─┐
+    matchLabels:                  │  THESE 2 MUST
+      app: web                    │  MATCH!
+  template:                       │
+    metadata:                     │
+      labels:                    ─┘
+        app: web                 ← labels of the created Pods
+    spec:
+      containers:
+      - name: web
+        image: nginx</code></pre>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Exam gotcha</div>
+  <p>If <code>selector.matchLabels</code> does NOT match <code>template.metadata.labels</code>, the API server rejects the Deployment. <strong>Always check that they match.</strong></p>
+</div>
+
+<h3>CronJob - 3 nested levels of spec</h3>
+
+<pre><code>apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+spec:                            # ← CronJob spec
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:                        # ← Job spec
+      template:
+        spec:                    # ← Pod spec
+          containers:
+          - name: backup
+            image: backup-tool
+          restartPolicy: OnFailure</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: CONFIG & SECRETS
+============================================================ -->
+<section id="config" class="section">
+<h2>4. Configuration - ConfigMaps & Secrets</h2>
+
+<p>Where you store configuration and credentials for Pods. <strong>3 ways</strong> to inject each one.</p>
+
+<h3>ConfigMap → Pod (3 paths)</h3>
+
+<div class="box">
+  <div class="row"><span class="card card-config">ConfigMap (key=value pairs)</span></div>
+  <div class="arrow-down">↓ Can be injected as:</div>
+
+  <div class="grid-3">
+    <div class="method-card">
+      <h4 style="color:#fcd34d;">1. envFrom (all keys)</h4>
+<pre><code>envFrom:
+- configMapRef:
+    name: app-config</code></pre>
+      <p>Injects ALL keys as env vars.</p>
+    </div>
+
+    <div class="method-card">
+      <h4 style="color:#fcd34d;">2. env (1 specific key)</h4>
+<pre><code>env:
+- name: APP_COLOR
+  valueFrom:
+    configMapKeyRef:
+      name: app-config
+      key: COLOR</code></pre>
+      <p>For a single key, with optional renaming.</p>
+    </div>
+
+    <div class="method-card">
+      <h4 style="color:#fcd34d;">3. volume (files)</h4>
+<pre><code>volumes:
+- name: cfg
+  configMap:
+    name: app-config
+# + volumeMount in the container</code></pre>
+      <p>Each key becomes a file.</p>
+    </div>
+  </div>
+</div>
+
+<h3>Secret → Pod (same 3 ways)</h3>
+
+<p>Identical to ConfigMap, but with <code>secretRef</code> / <code>secretKeyRef</code>, and the values are stored base64-encoded.</p>
+
+<pre><code># envFrom
+envFrom:
+- secretRef:
+    name: db-credentials
+
+# env
+env:
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: db-credentials
+      key: password
+
+# volume
+volumes:
+- name: secret-vol
+  secret:
+    secretName: db-credentials</code></pre>
+
+<div class="callout callout-info">
+  <div class="callout-title">💡 ConfigMap vs Secret</div>
+  <table>
+  <tr><th></th><th>ConfigMap</th><th>Secret</th></tr>
+  <tr><td>Encoding</td><td>Plain text</td><td>Base64 (not encryption!)</td></tr>
+  <tr><td>Typical use</td><td>General configuration</td><td>Passwords, tokens, certs</td></tr>
+  <tr><td>Imperative</td><td><code>kubectl create configmap</code></td><td><code>kubectl create secret generic</code></td></tr>
+  </table>
+</div>
+
+</section>
+
+<!-- ============================================================
+PART: NETWORKING
+============================================================ -->
+<section id="network" class="section">
+<h2>5. Networking - How traffic reaches Pods</h2>
+
+<p>Pods have their own IPs, but they are <strong>ephemeral</strong> (they change when the Pod is replaced). That is why we use <strong>Services</strong> as a stable abstraction.</p>
+
+<h3>External traffic flow → Pod</h3>
+
+<div class="box">
+  <div class="row">
+    <span class="note" style="font-size:1rem;">🌍 User</span>
+    <span class="arrow">→</span>
+    <span class="card card-net">Ingress</span>
+    <span class="arrow">→</span>
+    <span class="card card-net">Service</span>
+    <span class="arrow">→</span>
+    <span class="card card-pod">Pod(s)</span>
+  </div>
+  <p style="text-align:center; color:#94a3b8; font-size:0.82rem; margin-top: 0.75rem;">
+    Ingress does HTTP routing &bull; Service does load balancing (via selector → labels)
+  </p>
+</div>
+
+<h3>Service types</h3>
+
+<table>
+<tr><th>Type</th><th>Reachable from</th><th>Use case</th></tr>
+<tr><td><strong>ClusterIP</strong> (default)</td><td>Inside the cluster</td><td>Internal communication (back-end ← API)</td></tr>
+<tr><td><strong>NodePort</strong></td><td>Outside, via node IP:port (30000-32767)</td><td>Dev/testing</td></tr>
+<tr><td><strong>LoadBalancer</strong></td><td>Internet (cloud provider)</td><td>Production</td></tr>
+<tr><td><strong>ExternalName</strong></td><td>CNAME to an external service</td><td>DNS mapping</td></tr>
+</table>
+
+<h3>Service ↔ Pod (the critical link is via labels)</h3>
+
+<pre><code># Pod
+metadata:
+  labels:
+    app: web              ← the POD's label
+    tier: frontend
+spec:
+  containers:
+  - name: web
+    image: nginx
+
+# Service
+spec:
+  selector:
+    app: web              ← MUST match the Pod's label!
+  ports:
+  - port: 80              # Service port
+    targetPort: 80        # container port in the Pod</code></pre>
+
+<div class="callout callout-danger">
+  <div class="callout-title">🚨 Most common mistake on the exam</div>
+  <p>A Service whose selector does NOT match the Pods' labels. <strong>Always check:</strong></p>
+<pre><code>k get endpointslices -l kubernetes.io/service-name=SERVICE-NAME   # no endpoints → wrong selector!
+k get endpoints SERVICE-NAME                                      # older API (deprecated since 1.33, still works)</code></pre>
+</div>
+
+<h3>Ingress - Advanced HTTP routing</h3>
+
+<pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: mysite.com
+    http:
+      paths:
+      - path: /wear              ← /wear goes to...
+        pathType: Prefix
+        backend:
+          service:
+            name: wear-service   ← this Service
+            port:
+              number: 80
+      - path: /watch             ← /watch goes to...
+        pathType: Prefix
+        backend:
+          service:
+            name: watch-service  ← this other Service
+            port:
+              number: 80</code></pre>
+
+<h3>NetworkPolicy - Pod-level firewall</h3>
+
+<p>By default, ALL Pods can talk to each other. A NetworkPolicy <strong>restricts</strong> that.</p>
+
+<pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  podSelector:              ← WHICH Pods it applies to
+    matchLabels:
+      role: db
+  policyTypes:              ← PLURAL!
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:          ← WHO may connect in
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 3306</code></pre>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ AND vs OR (the CKAD gotcha)</div>
+<pre><code># AND - 1 hyphen, 2 selectors together
+from:
+- podSelector: {...}
+  namespaceSelector: {...}    # NO hyphen!
+
+# OR - 2 separate hyphens
+from:
+- podSelector: {...}
+- namespaceSelector: {...}    # WITH hyphen</code></pre>
+</div>
+
+</section>
+
+<!-- ============================================================
+PART: STORAGE
+============================================================ -->
+<section id="storage" class="section">
+<h2>6. Storage - How to persist data</h2>
+
+<p>When a Pod dies, it loses everything it wrote to its own disk. <strong>PV + PVC</strong> solves that.</p>
+
+<h3>Complete flow</h3>
+
+<div class="box">
+  <div class="connect">
+    <div class="connect-left"><span class="card card-storage">Admin creates PV</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">↓</div>
+      <div class="connect-via">storage offering</div>
+    </div>
+    <div class="connect-right"><span class="note">available in the cluster</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-storage">Developer creates PVC</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">request binds to a PV</div>
+    </div>
+    <div class="connect-right"><span class="card card-storage">PV</span></div>
+  </div>
+
+  <div class="connect">
+    <div class="connect-left"><span class="card card-pod">Pod</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">→</div>
+      <div class="connect-via">claimName</div>
+    </div>
+    <div class="connect-right"><span class="card card-storage">PVC</span></div>
+  </div>
+</div>
+
+<h3>The 3 YAMLs together</h3>
+
+<pre><code># 1. PV (offers 100Mi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi         ← capacity.storage (on the PV)
+  accessModes:
+  - ReadWriteMany          ← PLURAL!
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv/log
+
+---
+# 2. PVC (requests 50Mi)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-log
+spec:
+  accessModes:
+  - ReadWriteMany          ← must be compatible with the PV
+  resources:
+    requests:
+      storage: 50Mi        ← resources.requests.storage (on the PVC, different from the PV!)
+
+---
+# 3. Pod that uses the PVC
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: app
+    image: busybox
+    volumeMounts:
+    - name: log-storage    ← name of the VOLUME in the Pod
+      mountPath: /var/log/app
+  volumes:
+  - name: log-storage
+    persistentVolumeClaim:
+      claimName: pvc-log   ← name of the PVC</code></pre>
+
+<h3>Access Modes</h3>
+
+<table>
+<tr><th>Mode</th><th>Abbrev.</th><th>Meaning</th></tr>
+<tr><td>ReadWriteOnce</td><td>RWO</td><td>Read/write by a single node</td></tr>
+<tr><td>ReadOnlyMany</td><td>ROX</td><td>Read-only by many nodes</td></tr>
+<tr><td>ReadWriteMany</td><td>RWX</td><td>Read/write by many nodes</td></tr>
+<tr><td>ReadWriteOncePod</td><td>RWOP</td><td>Read/write by a single Pod</td></tr>
+</table>
+
+<h3>Volume types (in the Pod)</h3>
+
+<table>
+<tr><th>Type</th><th>Persistence</th><th>Typical use</th></tr>
+<tr><td><code>emptyDir</code></td><td>Lives as long as the Pod</td><td>Sharing between containers in the same Pod</td></tr>
+<tr><td><code>hostPath</code></td><td>Lives on the node</td><td>Access to the host's /var/log</td></tr>
+<tr><td><code>persistentVolumeClaim</code></td><td>Persistent</td><td>DBs, production data</td></tr>
+<tr><td><code>configMap</code> / <code>secret</code></td><td>Read-only</td><td>Configuration files</td></tr>
+</table>
+
+<h3>StorageClass - Dynamic Provisioning</h3>
+
+<p>Instead of creating PVs manually, a StorageClass creates them <strong>automatically</strong> when a PVC is created.</p>
+
+<div class="box">
+  <div class="row">
+    <span class="card card-storage">StorageClass</span>
+    <span class="arrow">+</span>
+    <span class="card card-storage">PVC</span>
+    <span class="arrow">→</span>
+    <span class="note">PV created automatically</span>
+    <span class="arrow">→</span>
+    <span class="card card-pod">Pod</span>
+  </div>
+</div>
+
+</section>
+
+<!-- ============================================================
+PART: SECURITY/RBAC
+============================================================ -->
+<section id="security" class="section">
+<h2>7. Security & RBAC - Who can do what?</h2>
+
+<h3>Subjects vs Resources</h3>
+
+<div class="box">
+  <div class="grid-3">
+    <div>
+      <h4 style="color:#fca5a5;">SUBJECTS (Who)</h4>
+      <div class="row-left"><span class="card card-security">User</span><span class="note">external (OIDC, certs)</span></div>
+      <div class="row-left"><span class="card card-security">Group</span><span class="note">group of users</span></div>
+      <div class="row-left"><span class="card card-security">ServiceAccount</span><span class="note">apps in the cluster</span></div>
+    </div>
+    <div>
+      <h4 style="color:#fca5a5;">RESOURCES (On what)</h4>
+      <div class="row-left"><span class="card card-pod">Pods</span></div>
+      <div class="row-left"><span class="card card-config">ConfigMaps</span></div>
+      <div class="row-left"><span class="card card-deploy">Deployments</span></div>
+      <div class="row-left"><span class="card card-node">Nodes</span><span class="note">(cluster-scoped)</span></div>
+    </div>
+  </div>
+</div>
+
+<h3>How subjects gain permissions</h3>
+
+<div class="box">
+  <div class="connect">
+    <div class="connect-left"><span class="card card-security">Subject</span></div>
+    <div class="connect-middle">
+      <div class="connect-arrow">←</div>
+      <div class="connect-via">RoleBinding links</div>
+    </div>
+    <div class="connect-right"><span class="card card-security">Role</span></div>
+  </div>
+  <p style="text-align:center; color:#94a3b8; font-size:0.82rem; margin-top: 0.75rem;">
+    A Role defines <em>permissions</em> (verbs on resources) &bull; A RoleBinding links permissions to subjects
+  </p>
+</div>
+
+<h3>Namespace-scoped vs Cluster-scoped</h3>
+
+<table>
+<tr><th></th><th>Namespace-scoped</th><th>Cluster-scoped</th></tr>
+<tr><td>Permissions resource</td><td><code>Role</code></td><td><code>ClusterRole</code></td></tr>
+<tr><td>Binding resource</td><td><code>RoleBinding</code></td><td><code>ClusterRoleBinding</code></td></tr>
+<tr><td>Can grant access to</td><td>Pods, services, configmaps...</td><td>Nodes, PVs, namespaces, etc.</td></tr>
+</table>
+
+<h3>Complete YAML - SA + Role + RoleBinding</h3>
+
+<pre><code># 1. ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dev-sa
+  namespace: default
+
+---
+# 2. Role (which verbs on which resources)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get"]
+
+---
+# 3. RoleBinding (links subjects to the Role)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: dev-sa
+  namespace: default       ← ALWAYS include!
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io</code></pre>
+
+<h3>Using the SA in a Pod</h3>
+
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+spec:
+  serviceAccountName: dev-sa    ← this makes the Pod use that SA
+  containers:
+  - name: app
+    image: my-app</code></pre>
+
+<p>Since Kubernetes 1.24, no token Secret is auto-created for a ServiceAccount. Pods get a short-lived projected token automatically; to get one manually, run <code>k create token dev-sa</code>.</p>
+
+<h3>Validating permissions</h3>
+
+<pre><code># Check MY permissions
+k auth can-i list pods
+
+# Check another SA's permissions (requires admin)
+k auth can-i list pods --as=system:serviceaccount:default:dev-sa
+
+# List ALL permissions
+k auth can-i --list --as=system:serviceaccount:default:dev-sa</code></pre>
+
+<h3>SecurityContext (on the Pod or Container)</h3>
+
+<pre><code>spec:
+  securityContext:          # POD level (affects all containers)
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  containers:
+  - name: app
+    image: nginx
+    securityContext:        # CONTAINER level (overrides)
+      runAsUser: 2000       # this container runs as user 2000
+      capabilities:
+        add: ["SYS_TIME"]   # ← capabilities ONLY at container level!</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: SCHEDULING
+============================================================ -->
+<section id="scheduling" class="section">
+<h2>8. Scheduling - How a Pod is placed on a Node</h2>
+
+<p>The <strong>kube-scheduler</strong> decides which node to place each Pod on, based on several rules.</p>
+
+<h3>Decision flow</h3>
+
+<div class="ascii">Pod created → Pending → Scheduler evaluates → Pod assigned to Node → Running
+
+Scheduler criteria:
+1. Resources (requests vs available)
+2. NodeSelector (label matching)
+3. NodeAffinity (advanced rules)
+4. Taints/Tolerations (reject/accept)
+5. Pod (Anti)Affinity (Pods together/apart)</div>
+
+<h3>NodeSelector - Simple</h3>
+
+<div class="box">
+  <div class="connect">
+    <div class="connect-left">
+      <span class="card card-node">Node</span>
+      <div class="note" style="margin-top:0.4rem;">label: <code>disktype=ssd</code></div>
+    </div>
+    <div class="connect-middle">
+      <div class="connect-arrow">↔</div>
+      <div class="connect-via">match</div>
+    </div>
+    <div class="connect-right">
+      <span class="card card-pod">Pod</span>
+      <div class="note" style="margin-top:0.4rem;">nodeSelector: <code>disktype=ssd</code></div>
+    </div>
+  </div>
+</div>
+
+<pre><code># 1. Add a label to the node
+k label nodes node-1 disktype=ssd
+
+# 2. Pod
+spec:
+  nodeSelector:
+    disktype: ssd</code></pre>
+
+<h3>Taints (on the Node) + Tolerations (on the Pod)</h3>
+
+<div class="box">
+  <div class="connect">
+    <div class="connect-left">
+      <span class="card card-node">Node</span>
+      <div class="note" style="margin-top:0.4rem;">taint: <code>special=true:NoSchedule</code></div>
+    </div>
+    <div class="connect-middle">
+      <div class="connect-arrow">⛔</div>
+      <div class="connect-via">repels Pods without a toleration</div>
+    </div>
+    <div class="connect-right"><span class="card card-pod">Pod</span></div>
+  </div>
+</div>
+
+<pre><code># 1. Taint on the node
+k taint nodes node-1 special=true:NoSchedule
+
+# 2. Toleration on the Pod
+spec:
+  tolerations:
+  - key: "special"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"</code></pre>
+
+<div class="callout callout-info">
+  <div class="callout-title">💡 Taints/Tolerations vs NodeSelector</div>
+  <p><strong>Taints</strong> repel Pods (unless they tolerate the taint). <strong>NodeSelector</strong> attracts Pods. To fully dedicate a node, combine both (or a taint plus NodeAffinity).</p>
+</div>
+
+<h3>NodeAffinity - More Flexible</h3>
+
+<pre><code>spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In           # In, NotIn, Exists, DoesNotExist
+            values:
+            - ssd
+            - nvme</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: OBSERVABILITY
+============================================================ -->
+<section id="observability" class="section">
+<h2>9. Observability - How to know it's OK</h2>
+
+<h3>The 3 probe types</h3>
+
+<table>
+<tr><th>Probe</th><th>Question</th><th>If it fails</th></tr>
+<tr><td><strong>Readiness</strong></td><td>Is it ready for traffic?</td><td>Removed from endpoints (no traffic)</td></tr>
+<tr><td><strong>Liveness</strong></td><td>Is it alive?</td><td><strong>Container is restarted</strong></td></tr>
+<tr><td><strong>Startup</strong></td><td>Has it started yet?</td><td>Container is killed and restarted (for slow-starting apps)</td></tr>
+</table>
+
+<h3>Complete YAML with 3 probes</h3>
+
+<pre><code>containers:
+- name: app
+  image: nginx
+  ports:
+  - containerPort: 80
+
+  startupProbe:               # slow start (e.g. 5 min)
+    httpGet:
+      path: /healthz
+      port: 80
+    failureThreshold: 30
+    periodSeconds: 10         # 30 × 10 = 300s = 5 min max
+
+  livenessProbe:              # detect deadlocks
+    httpGet:
+      path: /healthz
+      port: 80
+    periodSeconds: 10
+
+  readinessProbe:             # remove from traffic if not ready
+    httpGet:
+      path: /ready
+      port: 80
+    periodSeconds: 5</code></pre>
+
+<h3>Pod Lifecycle</h3>
+
+<div class="ascii">Pending → ContainerCreating → Running → (Succeeded | Failed)
+                                ↓
+                        (Liveness probe failing?)
+                                ↓
+                        Restart container
+                                ↓
+                        CrashLoopBackOff (if it restarts too often)</div>
+
+<h3>Debug Toolkit</h3>
+
+<pre><code># Basic state
+k get pods
+k get pods -o wide              # with IP and Node
+k get events --sort-by=.metadata.creationTimestamp
+
+# Investigate one Pod
+k describe pod NAME             # events + state + mounts
+k logs NAME                     # container logs
+k logs NAME -c CONTAINER        # multi-container
+k logs NAME --previous          # after a restart (CrashLoop)
+k logs NAME -f                  # follow/stream
+
+# Execute inside
+k exec -it NAME -- /bin/sh
+
+# Metrics (requires metrics-server)
+k top node
+k top pod
+k top pod --sort-by=cpu</code></pre>
+
+<h3>Common Exit Codes</h3>
+
+<table>
+<tr><th>Code</th><th>Meaning</th></tr>
+<tr><td>0</td><td>Success</td></tr>
+<tr><td>1</td><td>Application error</td></tr>
+<tr><td>137</td><td><strong>OOMKilled</strong> or SIGKILL (128 + 9) - out of memory</td></tr>
+<tr><td>143</td><td>Terminated gracefully (SIGTERM)</td></tr>
+</table>
+
+</section>
+
+<!-- ============================================================
+PART: MULTI-CONTAINER PATTERNS
+============================================================ -->
+<section id="multicontainer" class="section">
+<h2>10. Multi-container Patterns - initContainers &amp; Sidecars</h2>
+
+<p>A Pod can have <strong>several containers</strong> that share networking and volumes. There are 2 kinds: <strong>initContainers</strong> (run first and exit) and <strong>sidecars/regular containers</strong> (run in parallel).</p>
+
+<h3>Anatomy of a multi-container Pod</h3>
+
+<div class="box">
+  <div class="row"><span class="card card-pod">Pod</span></div>
+  <div class="arrow-down">↓ contains</div>
+  <div class="row" style="gap:1rem">
+    <span class="card card-config">initContainer 1</span>
+    <span class="note">→ runs + terminates</span>
+  </div>
+  <div class="row" style="gap:1rem">
+    <span class="card card-config">initContainer 2</span>
+    <span class="note">→ runs + terminates (sequential)</span>
+  </div>
+  <div class="arrow-down">↓ then</div>
+  <div class="row" style="gap:1rem">
+    <span class="card card-pod">main container</span>
+    <span class="card card-pod">sidecar</span>
+    <span class="note">→ run in parallel</span>
+  </div>
+</div>
+
+<h3>initContainers - "Setup before the show"</h3>
+
+<p>Containers that <strong>run to completion BEFORE</strong> the main containers start. They run sequentially (one at a time). If one fails, the Pod's restart policy applies and the app containers never start.</p>
+
+<table>
+<tr><th>Use case</th><th>Example</th></tr>
+<tr><td>Wait for a service</td><td>Wait for the DB to be ready before the app starts</td></tr>
+<tr><td>Filesystem setup</td><td>Clone a Git repo into a shared volume</td></tr>
+<tr><td>Downloading assets</td><td>Fetch config/certificates from a registry</td></tr>
+<tr><td>DB migrations</td><td>Run <code>db migrate</code> before the app</td></tr>
+<tr><td>Volume permissions</td><td>Run <code>chmod/chown</code> on a mounted volume</td></tr>
+</table>
+
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: web-with-init
+spec:
+  initContainers:                       # ← run FIRST, in order
+  - name: wait-for-db
+    image: busybox
+    command: ['sh','-c','until nslookup db; do sleep 2; done']
+  - name: clone-repo
+    image: alpine/git
+    command: ['git','clone','https://github.com/x/y','/data']
+    volumeMounts:
+    - name: shared
+      mountPath: /data
+  containers:                           # ← only start AFTER all init containers succeed
+  - name: web
+    image: nginx
+    volumeMounts:
+    - name: shared
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: shared
+    emptyDir: {}</code></pre>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Exam gotcha</div>
+  <p>initContainers run in <strong>ORDER</strong>, one at a time. If one fails, the Pod shows <code>Init:CrashLoopBackOff</code>. Debug with <code>k logs &lt;pod&gt; -c &lt;init-container-name&gt;</code>.</p>
+</div>
+
+<h3>Sidecars - "Helper container"</h3>
+
+<p>A container that runs <strong>in parallel</strong> with the main container. It shares the network (localhost) and can share volumes. Used for auxiliary tasks.</p>
+
+<table>
+<tr><th>Pattern</th><th>What it does</th><th>Example</th></tr>
+<tr><td><strong>Sidecar</strong></td><td>Extends the main container's functionality</td><td>Log shipper, file sync, cache sync</td></tr>
+<tr><td><strong>Ambassador</strong></td><td>Proxy to external services</td><td>Envoy proxy, service mesh</td></tr>
+<tr><td><strong>Adapter</strong></td><td>Normalizes the app's output</td><td>Convert logs to Prometheus format</td></tr>
+</table>
+
+<h4>Classic example: log sidecar</h4>
+
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: web-with-logger
+spec:
+  containers:
+  - name: web                           # ← main container
+    image: nginx
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log/nginx
+
+  - name: log-shipper                   # ← SIDECAR
+    image: busybox
+    command: ['sh','-c','tail -F /logs/access.log']
+    volumeMounts:
+    - name: logs
+      mountPath: /logs                  # ← SAME volume, different paths
+  volumes:
+  - name: logs
+    emptyDir: {}                        # ← shared between the 2</code></pre>
+
+<h3>Communication between containers in the same Pod</h3>
+
+<div class="box box-dark">
+  <h4 style="color:#fbbf24;margin-top:0">2 ways to share data:</h4>
+  <ul style="margin-left:1.25rem;color:#cbd5e1">
+    <li><strong>Network (localhost)</strong>: container A reaches container B via <code>localhost:&lt;port&gt;</code></li>
+    <li><strong>Shared volume</strong>: an <code>emptyDir</code> mounted in both (paths may differ)</li>
+  </ul>
+</div>
+
+<h3>NATIVE sidecars (K8s 1.28+, stable in 1.33)</h3>
+
+<p>Kubernetes 1.28 introduced <strong>native sidecar containers</strong>: an entry in <code>initContainers</code> with <code>restartPolicy: Always</code>. The difference: it starts before the main containers but <strong>does not exit</strong> - it keeps running for the whole lifecycle of the Pod (and is shut down after the main containers). The feature is enabled by default since 1.29 and stable (GA) since 1.33.</p>
+
+<pre><code>spec:
+  initContainers:
+  - name: log-shipper
+    image: busybox
+    restartPolicy: Always               # ← the magic: makes it a NATIVE sidecar
+    command: ['sh','-c','tail -F /logs/access.log']
+  containers:
+  - name: web
+    image: nginx</code></pre>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 For the CKAD exam</div>
+  <p>Know both patterns: the <strong>traditional</strong> one (parallel containers in the <code>containers:</code> array) and the <strong>native</strong> sidecar (<code>restartPolicy: Always</code> on an init container). Use whichever the task asks for; the native form guarantees startup ordering and clean shutdown, which matters for Jobs.</p>
+</div>
+
+<h3>Quick cheat sheet</h3>
+
+<table>
+<tr><th>Command</th><th>What it's for</th></tr>
+<tr><td><code>k logs POD -c CONTAINER</code></td><td>Logs of a specific container</td></tr>
+<tr><td><code>k logs POD -c INIT_NAME</code></td><td>Logs of an initContainer</td></tr>
+<tr><td><code>k exec POD -c CONTAINER -- sh</code></td><td>Shell in a specific container</td></tr>
+<tr><td><code>k describe pod POD</code></td><td>See the state of ALL containers (incl. init)</td></tr>
+</table>
+
+</section>
+
+<!-- ============================================================
+PART: HELM
+============================================================ -->
+<section id="helm" class="section">
+<h2>11. Helm - Package Manager for Kubernetes</h2>
+
+<p>Helm is the <strong>"apt-get / npm" of Kubernetes</strong>. Instead of applying 20 YAML files by hand, you install a <strong>chart</strong> with 1 command.</p>
+
+<h3>3 fundamental concepts</h3>
+
+<table>
+<tr><th>Term</th><th>Meaning</th><th>Analogy</th></tr>
+<tr><td><strong>Chart</strong></td><td>A package (templates + values) with everything needed to install an app</td><td>A <code>.deb</code> / npm package</td></tr>
+<tr><td><strong>Release</strong></td><td>An installed instance of a chart in the cluster (has a name)</td><td>A running application</td></tr>
+<tr><td><strong>Repository</strong></td><td>A collection of charts (HTTP URL)</td><td>apt repo / npm registry</td></tr>
+</table>
+
+<h3>Typical Helm flow</h3>
+
+<div class="box">
+  <div class="row"><span class="card card-config">Repository</span><span class="note">artifacthub.io / chart repos</span></div>
+  <div class="arrow-down">↓ <code>helm repo add</code></div>
+  <div class="row"><span class="card card-config">Chart</span><span class="note">templates/ + values.yaml</span></div>
+  <div class="arrow-down">↓ <code>helm install</code> + override values</div>
+  <div class="row"><span class="card card-deploy">Release</span><span class="note">resources created in the cluster</span></div>
+  <div class="arrow-down">↓ generates</div>
+  <div class="row" style="gap:.5rem">
+    <span class="card card-deploy">Deployment</span>
+    <span class="card card-net">Service</span>
+    <span class="card card-config">ConfigMap</span>
+    <span class="card card-security">Secret</span>
+  </div>
+</div>
+
+<h3>Essential commands (memorise!)</h3>
+
+<pre><code># Repositories
+helm repo add podinfo https://stefanprodan.github.io/podinfo
+helm repo update
+helm repo list
+helm search repo podinfo                     # search charts in added repos
+helm search hub wordpress                    # search Artifact Hub
+
+# Install
+helm install my-release podinfo/podinfo      # release name + chart
+helm install my-release ./local-chart        # local chart
+helm install my-release podinfo/podinfo \
+  --version 6.15.0 \                         # specific chart version
+  --namespace prod --create-namespace \      # namespace
+  --set image.tag=6.16.0 \                   # override 1 value
+  -f my-values.yaml                          # override multiple values
+
+# Lifecycle
+helm list                                    # releases in the current namespace
+helm list -A                                 # releases in all namespaces
+helm status my-release                       # release status
+helm get values my-release                   # show applied values
+helm get manifest my-release                 # final generated YAML
+
+# Upgrade / Rollback
+helm upgrade my-release podinfo/podinfo --set replicaCount=5
+helm history my-release                      # view revisions
+helm rollback my-release 1                   # go back to revision 1
+helm rollback my-release                     # go back to the previous revision
+
+# Uninstall
+helm uninstall my-release                    # remove everything
+helm uninstall my-release --keep-history     # keep history
+
+# Local templating (without installing)
+helm template my-release ./chart             # render YAML without applying
+helm install my-release ./chart --dry-run    # render and validate without installing</code></pre>
+
+<h3>Structure of a Chart</h3>
+
+<pre><code>my-chart/
+├── Chart.yaml          # metadata (name, version, description)
+├── values.yaml         # DEFAULT values (configurable)
+├── templates/          # YAMLs with {{ .Values.X }} placeholders
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── _helpers.tpl    # reusable functions/helpers
+├── charts/             # dependencies (subcharts)
+└── README.md</code></pre>
+
+<h3>Overriding values - 3 ways</h3>
+
+<pre><code># Way 1: inline --set (1-2 values)
+helm install web podinfo/podinfo --set replicaCount=3
+
+# Way 2: nested --set (with dots)
+helm install web podinfo/podinfo \
+  --set image.tag=6.16.0 \
+  --set service.type=NodePort
+
+# Way 3: -f YAML file (many values)
+cat &gt; my-values.yaml &lt;&lt;EOF
+replicaCount: 3
+image:
+  tag: "6.16.0"
+service:
+  type: NodePort
+EOF
+
+helm install web podinfo/podinfo -f my-values.yaml
+
+# COMBINING (precedence: --set &gt; -f &gt; default values.yaml)
+helm install web podinfo/podinfo -f my-values.yaml --set replicaCount=5</code></pre>
+
+<h3>Helm vs kubectl - when to use each</h3>
+
+<table>
+<tr><th>Scenario</th><th>Tool</th></tr>
+<tr><td>Installing a third-party app (nginx, postgres, prometheus)</td><td><strong>Helm</strong></td></tr>
+<tr><td>A complex custom app with 10+ resources</td><td><strong>Helm</strong> (build your own chart)</td></tr>
+<tr><td>One-off simple resources</td><td><strong>kubectl</strong></td></tr>
+<tr><td>Multiple environments (dev/staging/prod) with small differences</td><td><strong>Kustomize</strong> (preferred) or Helm</td></tr>
+<tr><td>Dynamic templating with logic</td><td><strong>Helm</strong></td></tr>
+</table>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Exam gotcha</div>
+  <p>Common mix-ups:</p>
+  <ul style="margin-left:1.25rem;margin-top:.4rem">
+    <li><code>helm install &lt;chart&gt;</code> ❌ → It must be <code>helm install &lt;RELEASE_NAME&gt; &lt;chart&gt;</code></li>
+    <li>Forgetting <code>--namespace</code> → the release goes to <code>default</code></li>
+    <li><code>--set</code> uses <strong>dots</strong> for nested keys (<code>image.tag</code>), not slashes</li>
+    <li>Rollback uses the <strong>revision number</strong>, not the chart version</li>
+  </ul>
+</div>
+
+<h3>Exam cheat sheet</h3>
+
+<pre><code># Typical sequence for a CKAD Helm task:
+helm repo add NAME URL                       # add repo
+helm repo update                             # refresh index
+helm search repo CHART                       # find the chart
+helm install RELEASE REPO/CHART -n NS        # install
+helm list -A                                 # confirm
+helm upgrade RELEASE REPO/CHART --set X=Y    # change
+helm history RELEASE                         # view revisions
+helm rollback RELEASE N                      # go back
+helm uninstall RELEASE                       # remove</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: DOCKER & CONTAINER IMAGES (CKAD focus)
+============================================================ -->
+<section id="docker" class="section">
+<h2>12. Docker &amp; Container Images (CKAD focus)</h2>
+
+<p>Building container images falls under the "Application Design and Build" domain of the CKAD curriculum (define, build and modify container images). This section covers the essentials - nothing more, nothing less.</p>
+
+<h3>Where Docker fits in the Kubernetes stack</h3>
+
+<div class="box">
+  <div class="row"><span class="card card-deploy">App code</span></div>
+  <div class="arrow-down">↓ <code>docker build</code> + Dockerfile</div>
+  <div class="row"><span class="card card-config">Container Image</span><span class="note">packaged app (filesystem + metadata)</span></div>
+  <div class="arrow-down">↓ <code>docker push</code></div>
+  <div class="row"><span class="card card-storage">Image Registry</span><span class="note">Docker Hub / GCR / ECR / private</span></div>
+  <div class="arrow-down">↓ Pod spec references the image</div>
+  <div class="row"><span class="card card-pod">Pod (Container Runtime pulls it)</span></div>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Important for CKAD</div>
+  <p>Kubernetes removed its built-in Docker Engine support (<code>dockershim</code>) in 1.24. Clusters now use a CRI runtime such as <code>containerd</code> or <code>CRI-O</code>. <code>docker</code> commands are for BUILD/TAG on your workstation; on cluster nodes, use <code>crictl</code>. The <strong>image format is the same</strong> (OCI), so images built with Docker run fine.</p>
+</div>
+
+<h3>Essential Dockerfile (what matters for CKAD)</h3>
+
+<pre><code># Dockerfile for a simple Node.js app
+FROM node:22-alpine                # ← base image
+WORKDIR /app                       # ← set the working directory
+COPY package*.json ./              # ← copy files from the host into the image
+RUN npm ci --omit=dev              # ← run a command during build
+COPY . .                           # ← copy the rest of the code
+EXPOSE 3000                        # ← documents the port (metadata only!)
+ENV NODE_ENV=production            # ← environment variable
+USER node                          # ← non-root user (security!)
+CMD ["node", "server.js"]          # ← default command at startup</code></pre>
+
+<h4>CMD vs ENTRYPOINT (frequent gotcha!)</h4>
+
+<table>
+<tr><th>Directive</th><th>Behaviour</th><th>Kubernetes equivalent</th></tr>
+<tr><td><code>CMD ["a","b"]</code></td><td>Default command/arguments - can be overridden</td><td>Pod <code>args:</code></td></tr>
+<tr><td><code>ENTRYPOINT ["a"]</code></td><td>Fixed executable - not easily overridden</td><td>Pod <code>command:</code></td></tr>
+<tr><td>Both</td><td>ENTRYPOINT + CMD are <strong>concatenated</strong> at run time</td><td>Pod <code>command + args</code></td></tr>
+</table>
+
+<pre><code># Dockerfile with both:
+ENTRYPOINT ["/bin/sh", "-c"]       # fixed executable
+CMD ["echo hello"]                 # default argument
+
+# At runtime:
+# docker run image           → /bin/sh -c "echo hello"
+# docker run image "ls -la"  → /bin/sh -c "ls -la"  (overrides CMD)
+
+# In Kubernetes:
+spec:
+  containers:
+  - image: my-image
+    command: ["/bin/sh", "-c"]     # overrides ENTRYPOINT
+    args: ["echo hello"]           # overrides CMD</code></pre>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Exam gotcha</div>
+  <p>In Kubernetes, <code>command:</code> maps to ENTRYPOINT and <code>args:</code> maps to CMD. <strong>If you set <code>command</code> in the Pod, the image's ENTRYPOINT is IGNORED</strong> (not extended!), and so is the image's CMD unless you also set <code>args</code>.</p>
+</div>
+
+<h3>Build &amp; Tag - essential syntax</h3>
+
+<pre><code># Build from the Dockerfile in the current directory
+docker build -t hello:1.2.3 .
+                    │     │  │
+                    │     │  └── build context (where the Dockerfile is)
+                    │     └── tag (version)
+                    └── image name
+
+# Multiple tags in one build
+docker build -t hello:1.2.3 -t hello:latest .
+
+# Additional tag for an existing image
+docker tag hello:1.2.3 myregistry.io/team/hello:1.2.3
+
+# Build with a Dockerfile at another path
+docker build -t hello:1.2.3 -f /path/to/Dockerfile.prod .</code></pre>
+
+<h3>Image references - full anatomy</h3>
+
+<div class="box box-dark">
+  <div style="font-family:monospace;font-size:.9rem;color:#cbd5e1;text-align:center;padding:.5rem">
+    <span style="color:#fbbf24">myregistry.io</span><span style="color:#94a3b8">/</span><span style="color:#86efac">team/project</span><span style="color:#94a3b8">/</span><span style="color:#93c5fd">myapp</span><span style="color:#94a3b8">:</span><span style="color:#fca5a5">1.2.3</span><span style="color:#94a3b8">@</span><span style="color:#d8b4fe">sha256:abcd...</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem;font-size:.82rem">
+    <div><strong style="color:#fbbf24">registry</strong> — optional, default <code>docker.io</code></div>
+    <div><strong style="color:#86efac">namespace/path</strong> — optional</div>
+    <div><strong style="color:#93c5fd">image name</strong> — required</div>
+    <div><strong style="color:#fca5a5">tag</strong> — default <code>latest</code> (RISKY!)</div>
+    <div><strong style="color:#d8b4fe">digest</strong> — optional, safer than a tag</div>
+    <div></div>
+  </div>
+</div>
+
+<pre><code># Examples (shortest to most explicit):
+nginx                              # docker.io/library/nginx:latest
+nginx:1.27                         # docker.io/library/nginx:1.27
+myorg/nginx:1.27                   # docker.io/myorg/nginx:1.27
+gcr.io/google-containers/nginx:1.27
+quay.io/myteam/myapp:v2.0.1
+myapp@sha256:abc123...             # by digest (immutable!)</code></pre>
+
+<h3>Save / Load (OCI exports)</h3>
+
+<pre><code># Export an image to a tarball (useful for air-gapped clusters)
+docker save -o hello.tar hello:1.2.3
+docker save hello:1.2.3 &gt; hello.tar     # alternative
+
+# Multiple images in one tarball
+docker save -o multi.tar nginx:1.27 redis:7-alpine
+
+# Load from a tarball
+docker load -i hello.tar
+docker load &lt; hello.tar
+
+# List images after loading
+docker images</code></pre>
+
+<h3>Push &amp; Pull (registries)</h3>
+
+<pre><code># Log in to a registry (default Docker Hub)
+docker login                                  # Docker Hub
+docker login myregistry.io                    # custom registry
+
+# Push (the image MUST be tagged with the registry URL)
+docker tag hello:1.2.3 myregistry.io/team/hello:1.2.3
+docker push myregistry.io/team/hello:1.2.3
+
+# Pull
+docker pull nginx:1.27
+docker pull myregistry.io/team/hello:1.2.3
+
+# Inspect
+docker inspect hello:1.2.3                    # full JSON
+docker history hello:1.2.3                    # image layers</code></pre>
+
+<h3>Modern alternatives (in case the exam uses them)</h3>
+
+<pre><code># PODMAN (drop-in replacement for docker, daemonless)
+podman build -t hello:1.2.3 .
+podman save -o hello.tar hello:1.2.3
+podman load -i hello.tar
+# alias docker=podman   ← works almost always
+
+# BUILDAH (build only, lighter)
+buildah build -t hello:1.2.3 .
+buildah from alpine                # start a working container
+buildah commit container hello:1.2.3
+
+# CRICTL (CRI client - used on Kubernetes nodes)
+crictl images                      # list images
+crictl pull nginx:1.27             # pull
+crictl ps                          # list containers (not Pods!)
+crictl logs CONTAINER_ID
+crictl exec -it CONTAINER_ID sh
+crictl inspecti IMAGE_ID           # inspect image
+
+# SKOPEO (copy between registries / formats)
+skopeo copy docker://hello:1.2.3 oci:./hello-oci
+skopeo copy docker://nginx:1.27 docker://myregistry.io/nginx:1.27
+skopeo inspect docker://nginx:1.27</code></pre>
+
+<h3>Kubernetes ↔ Docker - how the cluster uses images</h3>
+
+<h4>imagePullPolicy</h4>
+
+<table>
+<tr><th>Value</th><th>Behaviour</th><th>When to use</th></tr>
+<tr><td><code>Always</code></td><td>ALWAYS pulls (checks the registry even if the image is local)</td><td>Mutable tags (<code>latest</code>, <code>dev</code>)</td></tr>
+<tr><td><code>IfNotPresent</code></td><td>Only pulls if the image is not present locally</td><td>Immutable tags (specific versions)</td></tr>
+<tr><td><code>Never</code></td><td>NEVER pulls - only uses a local image</td><td>Local dev with preloaded images</td></tr>
+</table>
+
+<pre><code># Kubernetes defaults:
+# Tag = "latest" OR omitted → Always
+# Specific tag (e.g. 1.27)  → IfNotPresent
+
+containers:
+- name: web
+  image: nginx:1.27
+  imagePullPolicy: IfNotPresent       # ← explicit</code></pre>
+
+<h4>Private registry - imagePullSecrets</h4>
+
+<pre><code># 1. Create a Secret with the registry credentials
+k create secret docker-registry regcred \
+  --docker-server=myregistry.io \
+  --docker-username=user \
+  --docker-password=PASSWORD \
+  --docker-email=user@example.com
+
+# 2. Reference it in the Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: private-pod
+spec:
+  imagePullSecrets:                   # ← HERE
+  - name: regcred
+  containers:
+  - name: app
+    image: myregistry.io/team/myapp:1.0
+
+# 3. Alternative: attach it to the ServiceAccount (all Pods using the SA get it)
+k patch sa default -p '{"imagePullSecrets":[{"name":"regcred"}]}'</code></pre>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Typical errors (debugging)</div>
+  <table style="margin-top:.4rem">
+    <tr><th>Pod status</th><th>Typical cause</th></tr>
+    <tr><td><code>ErrImagePull</code></td><td>Registry unreachable / wrong image name</td></tr>
+    <tr><td><code>ImagePullBackOff</code></td><td>Failed repeatedly — check name + credentials</td></tr>
+    <tr><td><code>InvalidImageName</code></td><td>Invalid format (disallowed characters)</td></tr>
+    <tr><td><code>ErrImageNeverPull</code></td><td><code>imagePullPolicy: Never</code> but the image is not local</td></tr>
+  </table>
+  <p style="margin-top:.5rem">Debug: <code>k describe pod POD</code> shows the exact reason under "Events".</p>
+</div>
+
+<h3>Multi-stage builds (good practice)</h3>
+
+<pre><code># Build phase + Runtime phase = small final image
+FROM golang:1.24 AS builder
+WORKDIR /src
+COPY . .
+RUN go build -o /app
+
+FROM alpine:3.21                      # ← final image, no Go SDK
+WORKDIR /
+COPY --from=builder /app /app         # ← copies only the binary
+EXPOSE 8080
+ENTRYPOINT ["/app"]
+
+# Result: final image ~10MB instead of ~800MB</code></pre>
+
+<h3>Docker exam cheat sheet</h3>
+
+<pre><code># Build &amp; tag (format hello:VERSION)
+docker build -t IMAGE:TAG .
+docker tag SRC:TAG DST:TAG
+
+# Save/Load (OCI export)
+docker save -o FILE.tar IMAGE:TAG
+docker load -i FILE.tar
+
+# Inspect &amp; debug
+docker images
+docker inspect IMAGE:TAG
+docker history IMAGE:TAG
+
+# Push (registry)
+docker login REGISTRY
+docker push REGISTRY/PATH/IMAGE:TAG
+
+# Runtime equivalent on the cluster
+crictl images           # list
+crictl pull IMAGE:TAG   # pull
+crictl ps               # containers
+crictl logs ID          # logs</code></pre>
+
+</section>
+
+<!-- ============================================================
+PART: CHEAT SHEET
+============================================================ -->
+<section id="cheatsheet" class="section">
+<h2>13. Final Cheat Sheet - What connects to what</h2>
+
+<h3>"If you see X, remember Y"</h3>
+
+<table>
+<tr><th>If you see...</th><th>Remember you need...</th></tr>
+<tr><td>Pod with a PVC volume</td><td>PVC created + PV (or StorageClass)</td></tr>
+<tr><td>Service not working</td><td><code>k get endpointslices -l kubernetes.io/service-name=NAME</code> — if empty, wrong selector</td></tr>
+<tr><td>Pod in CrashLoopBackOff</td><td><code>k logs --previous</code> + check the liveness probe</td></tr>
+<tr><td>Pod Pending</td><td><code>k describe pod</code> — check resources/taints/affinity</td></tr>
+<tr><td>Ingress not routing</td><td>Ingress Controller installed? Annotations? Correct Service?</td></tr>
+<tr><td>NetworkPolicy blocks everything</td><td>Missing DNS (port 53)? Check Egress rules</td></tr>
+<tr><td>RBAC denies access</td><td><code>k auth can-i --list --as=...</code> + check the binding</td></tr>
+<tr><td>Pod uses an SA but lacks permission</td><td>Does the RoleBinding have the correct subject?</td></tr>
+</table>
+
+<h3>Essential imperative commands</h3>
+
+<pre><code># Pods
+k run nginx --image=nginx --port=80
+k run nginx --image=nginx --dry-run=client -o yaml > pod.yaml
+
+# Deployments
+k create deployment web --image=nginx --replicas=3
+k scale deployment web --replicas=5
+k set image deployment/web nginx=nginx:1.25
+k rollout undo deployment/web
+
+# Services
+k expose deployment web --port=80 --type=NodePort
+k create service clusterip redis --tcp=6379:6379
+
+# ConfigMaps/Secrets
+k create configmap NAME --from-literal=KEY=VALUE
+k create secret generic NAME --from-literal=KEY=VALUE
+
+# RBAC
+k create serviceaccount NAME
+k create role NAME --verb=get,list --resource=pods
+k create rolebinding NAME --role=ROLE --serviceaccount=NS:SA
+
+# Ingress
+k create ingress NAME --rule="host/path=svc:port"
+
+# Jobs/CronJobs
+k create job NAME --image=IMG -- cmd
+k create cronjob NAME --image=IMG --schedule="*/5 * * * *" -- cmd
+
+# ResourceQuota
+k create quota NAME --hard=pods=10,cpu=4
+
+# No imperative command (YAML only)
+# NetworkPolicy, PV, PVC, StorageClass, LimitRange, CRD</code></pre>
+
+<h3>Recommended aliases</h3>
+
+<pre><code>alias k=kubectl
+export do="--dry-run=client -o yaml"
+export now="--grace-period 0 --force"
+
+# Usage
+k run nginx --image=nginx $do > pod.yaml
+k create deployment web --image=nginx --replicas=3 $do > deploy.yaml
+k delete pod nginx $now</code></pre>
+
+<h3>Validate before applying</h3>
+
+<pre><code>k apply -f file.yaml --dry-run=client    # client-side validation
+k apply -f file.yaml --dry-run=server    # server-side validation (stricter)
+k explain pod.spec.containers            # inline documentation</code></pre>
+
+</section>
+
+<div class="footer">
+  📚 Use as a study aid + a last review before the exam &bull; CKAD
+</div>
+
+</div>
+</body>
+</html>
